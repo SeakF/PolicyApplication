@@ -1,0 +1,29 @@
+:root {
+	--clr-gradient-1: #00b4db;
+	--clr-gradient-2: #0083b0;
+	--clr-delete-red: #b0123b;
+}
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+.loading-screen {
+	width: 100%;
+	background-color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.loading-screen > div {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 30px;
+	letter-spacing: 5px;
+}

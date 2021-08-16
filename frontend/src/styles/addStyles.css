@@ -1,0 +1,252 @@
+:root {
+	--clr-gradient-1: #00b4db;
+	--clr-gradient-2: #0083b0;
+	--clr-delete-red: #b0123b;
+}
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+input {
+	border-radius: 4px;
+	border-color: gray;
+	padding: 1px;
+}
+select {
+	border-radius: 4px;
+	border-top-color: #2c2c2c;
+	border-left-color: #2c2c2c;
+	border-right-color: #808080;
+	border-bottom-color: #808080;
+	padding: 1px;
+	border-width: 2px;
+}
+
+.add-container {
+	width: 100%;
+	background-color: white;
+}
+
+.add-container label {
+	width: auto;
+}
+
+.add-title {
+	padding: 30px;
+	font-size: min(50px, 4vw);
+	color: white;
+	letter-spacing: 3px;
+	background-color: var(--clr-gradient-2);
+}
+
+.add-section {
+	border-top: 2px solid var(--clr-gradient-2);
+	padding: 30px;
+}
+
+.add-section-title {
+	color: var(--clr-gradient-2);
+	letter-spacing: 3px;
+	padding: 10px;
+}
+
+.add-section-forms {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	column-gap: 6px;
+	row-gap: 6px;
+	padding: 30px;
+	width: min(900px, 100%);
+	font-size: min(15px, 4vw);
+}
+
+.add-section-forms-radio {
+	max-width: 70vw;
+}
+
+.type-form {
+	border: 1px solid var(--clr-gradient-1);
+}
+
+.accept-container {
+	width: min(500px, 80vw);
+}
+
+.accept-btn-container {
+	border: 2px solid var(--clr-gradient-2);
+	font-size: min(5vw, 30px);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 50px;
+	border-radius: 25px;
+	color: var(--clr-gradient-2);
+	cursor: pointer;
+	letter-spacing: 3px;
+	margin-top: 40px;
+	text-decoration: none;
+	background-color: white;
+}
+
+.delete-btn-container {
+	border: 2px solid var(--clr-delete-red);
+	font-size: min(5vw, 30px);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 50px;
+	border-radius: 25px;
+	color: var(--clr-delete-red);
+	cursor: pointer;
+	letter-spacing: 3px;
+	margin-top: 40px;
+	text-decoration: none;
+}
+.delete-btn-container:hover {
+	background-color: var(--clr-delete-red);
+	color: white;
+}
+
+.add-section-forms label {
+	font-size: 10px;
+	letter-spacing: 1px;
+	margin-bottom: 10px;
+}
+
+.accept-btn-container:hover {
+	background-color: var(--clr-gradient-2);
+	color: white;
+}
+
+.edit-details {
+	width: min(50vw, 200px);
+	padding: 5px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.input-label {
+	font-size: 18px;
+}
+
+.special-title-client {
+	background-color: var(--clr-gradient-2);
+	color: white;
+}
+
+.confirm-delete {
+	width: 100%;
+	height: 100vh;
+	position: fixed;
+	top: 0px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.confirm-delete-cont {
+	border: 2px solid var(--clr-gradient-2);
+	border-radius: 20px;
+	min-width: 50vw;
+	min-height: 40vh;
+	background-color: white;
+	padding: 30px;
+	font-size: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	letter-spacing: 3px;
+}
+
+.existing-client-list {
+	padding: 0;
+	border: 1px solid var(--clr-gradient-2);
+	max-height: 30vh;
+	display: block;
+	overflow-y: auto;
+	overflow-x: auto;
+}
+
+.existing-client-list-element {
+	border: 1px solid var(--clr-gradient-1);
+	height: 90px;
+	width: 100%;
+	min-width: 525px;
+	display: flex;
+	cursor: pointer;
+}
+
+.existing-client-list-element > div {
+	border-right: 1px dashed var(--clr-gradient-2);
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	word-wrap: break-word;
+}
+
+.existing-client-list-element > div:last-of-type {
+	border-right: 0px dashed var(--clr-gradient-2);
+}
+
+.error-window-container {
+	width: 100%;
+	height: 100vh;
+	position: fixed;
+	top: 0px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.error-window {
+	border: 2px solid var(--clr-gradient-2);
+	border-radius: 20px;
+	min-width: 50vw;
+	min-height: 40vh;
+	background-color: white;
+	padding: 30px;
+	font-size: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	letter-spacing: 3px;
+}
+
+@media only screen and (max-width: 460px) {
+	.add-container label {
+		width: 50vw;
+	}
+
+	.add-section {
+		padding: 10px 0px;
+	}
+
+	.add-section-forms {
+		padding: 30px 10px;
+	}
+
+	.accept-container {
+		margin: auto;
+	}
+
+	.accept-btn-container {
+		margin: auto;
+		padding: 10px;
+	}
+
+	.delete-btn-container {
+		padding: 10px;
+	}
+}

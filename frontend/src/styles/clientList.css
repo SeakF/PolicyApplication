@@ -1,0 +1,182 @@
+:root {
+	--clr-gradient-1: #00b4db;
+	--clr-gradient-2: #0083b0;
+}
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+.client-list {
+	height: 90vh;
+	background-color: white;
+}
+
+.client-list-menu {
+	background-color: white;
+	width: 100%;
+	min-height: 10vh;
+	display: flex;
+	flex-wrap: wrap;
+	margin: auto;
+}
+
+.client-list-menu-columns {
+	display: flex;
+	flex-direction: column;
+	padding: 3px 5px;
+	border: 1px solid var(--clr-gradient-2);
+	flex-grow: 1;
+	justify-content: center;
+}
+
+.client-list-menu-columns:last-of-type {
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.client-list-menu-columns:last-of-type > * {
+	border: 1px solid var(--clr-gradient-2);
+	padding: 2px;
+	border-radius: 5px;
+	cursor: pointer;
+	color: var(--clr-gradient-2);
+}
+
+.client-list-menu-columns:last-of-type > *:hover {
+	color: white;
+	background-color: var(--clr-gradient-2);
+}
+
+.client-list-list {
+	background-color: white;
+	margin: auto;
+	width: 100%;
+	min-height: 40vh;
+	max-height: 75vh;
+	overflow-y: scroll;
+	overflow-x: scroll;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+}
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+	background: rgb(158, 158, 158);
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgb(105, 105, 105);
+}
+
+.client-list-sort {
+	display: flex;
+	font-size: min(4vw, 15px);
+	letter-spacing: 1px;
+	position: sticky;
+	top: 0px;
+	z-index: 1;
+	background-color: var(--clr-gradient-2);
+	color: white;
+	min-width: 1400px;
+}
+
+.client-list-sort-option {
+	flex: 4;
+	align-self: stretch;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	border-right: 1px solid white;
+	padding: 7px 0px;
+}
+
+.client-list-sort-option:first-child {
+	flex: 1;
+}
+
+.client-list-element {
+	border-bottom: 1px solid var(--clr-gradient-2);
+	display: flex;
+	text-align: center;
+	color: black;
+	text-decoration: none;
+	min-width: 1400px;
+}
+
+.client-list-element:hover {
+	background-color: #0084b038;
+}
+
+.client-list-element-option:first-child {
+	flex: 1;
+	border-left: 0px dotted var(--clr-gradient-1);
+}
+.client-list-element-option {
+	font-size: min(4vw, 15px);
+	letter-spacing: 1px;
+	flex: 4;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-left: 1px dotted var(--clr-gradient-1);
+	padding: 15px 0px;
+}
+
+.client-list-element-message-container {
+	flex: 4;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-left: 1px dotted var(--clr-gradient-1);
+	border-right: 1px dotted var(--clr-gradient-1);
+	padding: 3px 0px;
+	font-size: min(4vw, 15px);
+	flex-direction: column;
+}
+
+.client-list-element-message-container-inner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1px;
+}
+
+.client-list-element-message {
+	border: 1px solid var(--clr-gradient-1);
+	padding: 3px;
+	border-radius: 5px;
+	cursor: pointer;
+	color: var(--clr-gradient-1);
+	letter-spacing: 1px;
+	width: fit-content;
+	margin-left: 1vw;
+	height: 30px;
+	width: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.client-list-element-message:hover {
+	background-color: var(--clr-gradient-1);
+	color: white;
+}
+
+@media only screen and (max-width: 750px) {
+	.client-list-element-message-container {
+		flex-direction: column;
+		padding: 0px;
+	}
+
+	.client-list-element-option {
+		padding: 0px;
+	}
+}
