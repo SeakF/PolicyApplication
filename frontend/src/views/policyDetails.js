@@ -1,19 +1,19 @@
 import React, {useEffect, useState} from "react"
 import {useParams} from 'react-router-dom'
 import {Link} from 'react-router-dom'
-import LoadingScreen from '../components/loadingScreen'
+import LoadingScreen from '../components/LoadingScreen'
 import { useSelector, useDispatch } from 'react-redux'
+import { computeDateToString, computeStringToDate, generatePdf, addMonth } from '../features/functions/functions'
 import { DELETE_POLICY, EDIT_POLICY, selectClient, statusState, getSpecificClient } from '../features/clients/clients'
-import ErrorWindow from '../components/errorWindow'
+import ErrorWindow from '../components/ErrorWindow'
 import '../styles/addStyles.css'
 import EditIcon from '@material-ui/icons/Edit'
 import SaveIcon from '@material-ui/icons/Save'
 import CancelIcon from '@material-ui/icons/Cancel'
 import DeleteIcon from '@material-ui/icons/Delete'
 import PersonIcon from '@material-ui/icons/Person'
-import Navbar from '../components/navbar'
+import Navbar from '../components/Navbar'
 import DescriptionIcon from '@material-ui/icons/Description'
-import {saveAs} from 'file-saver'
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import NoteAddIcon from '@material-ui/icons/NoteAdd'
@@ -27,56 +27,60 @@ const PolicyDetails = () => {
     const status = useSelector(statusState)
 
     const [client, setClient] = useState({})
-    const [policy, setPolicy] = useState({})
     const [id, setId] = useState('')
-    const [name, setName] = useState('')
-    const [surname, setSurname] = useState('')
-    const [address, setAddress] = useState('')
+
+    const [person, setPerson] = useState({
+        name: '',
+        surname: '',
+        address: ''
+    })
+
+    const [policy, setPolicy] = useState({
+        policyNumber: '',
+        company: '',
+        policyType: '',
+        typeDetails: {
+            detail1: '',
+            detail2: '',
+            detail3: '',
+            detail4: ''
+        },
+        policyVariant: '',
+        policyDateSet: '',
+        policyDateEnd: '',
+        payment: '',
+        amount: '',
+        installments: '',
+        written: '',
+        note: ''
+    })
+
+    const [subPolicy, setSubPolicy] = useState({
+        policyNumber: '',
+        company: '',
+        policyType: '',
+        typeDetails: {
+            detail1: '',
+            detail2: '',
+            detail3: '',
+            detail4: ''
+        },
+        policyVariant: '',
+        policyDateSet: '',
+        policyDateEnd: '',
+        payment: '',
+        amount: '',
+        installments: '',
+        written: '',
+        note: ''
+    })
 
     const [policyId, setPolicyId] = useState('')
-    const [policyNumber, setPolicyNumber] = useState('')
-    const [company, setCompany] = useState('')
-
-    const [policyType, setPolicyType] = useState('')
-    const [typeDetailSt, setTypeDetailSt] = useState('')
-    const [typeDetailNd, setTypeDetailNd] = useState('')
-    const [typeDetailRd, setTypeDetailRd] = useState('')
-    const [typeDetailTh, setTypeDetailTh] = useState('')
-    const [typeDetail5Th, setTypeDetail5Th] = useState('')
-    
-    const [policyVariant, setPolicyVariant] = useState('')
-
-    const [policyConfirmDate, setPolicyConfirmDate] = useState('')
-    const [policyDateSet, setPolicyDateSet] = useState(null)
-    const [policyDateEnd, setPolicyDateEnd] = useState(null)
-
-    const [payment, setPayment] = useState('')
-    const [amount, setAmount] = useState('')
-    const [installments, setInstallments] = useState('')
-
-
-    const [subPolicyNumber, setSubPolicyNumber] = useState('')
-    const [subCompany, setSubCompany] = useState('')
-    const [subPolicyType, setSubPolicyType] = useState('')
-    const [subTypeDetailSt, setSubTypeDetailSt] = useState('')
-    const [subTypeDetailNd, setSubTypeDetailNd] = useState('')
-    const [subTypeDetailRd, setSubTypeDetailRd] = useState('')
-    const [subTypeDetail5Th, setSubTypeDetail5Th] = useState('')
-    const [subPolicyVariant, setSubPolicyVariant] = useState('')
-    const [subPolicyConfirmDate, setSubPolicyConfirmDate] = useState('')
-    const [subPolicyDateSet, setSubPolicyDateSet] = useState(null)
-    const [subPolicyDateEnd, setSubPolicyDateEnd] = useState(null)
-    const [subPayment, setSubPayment] = useState('')
-    const [subAmount, setSubAmount] = useState('')
-    const [subInstallments, setSubInstallments] = useState('')
-
-    const [written, setWritten] = useState('')
-    const [note, setNote] = useState('')
 
     
     const [edit, setEdit] = useState(false)
     const [show, setShow] = useState(false)
-
+    
     useEffect(() => {
         const load = () => {
             let foundPolicy = null
@@ -88,54 +92,60 @@ const PolicyDetails = () => {
                     foundPolicy = client.policy.find((policy) => policy._id === params[0])
                 }
             })
-
             
 
             if (foundPolicy && foundClient) {
                 setClient(foundClient)
                 setPolicy(foundPolicy)
+
                 setId(foundClient._id)
-                setName(foundClient.name)
-                setSurname(foundClient.surname)
-                setAddress(foundClient.address)
+                setPerson({
+                    ...person,
+                    name: foundClient.name,
+                    surname: foundClient.surname,
+                    address: foundClient.address 
+                })
 
-                
                 setPolicyId(foundPolicy._id)
-                setPolicyNumber(foundPolicy.policyNumber)
-                setCompany(foundPolicy.policyCompany || '-')
-                setPolicyType(foundPolicy.policyType || '-')
-                setTypeDetailSt(foundPolicy.typeDetails.detail1 || foundPolicy.typeDetails[0] || '-')
-                setTypeDetailNd(foundPolicy.typeDetails.detail2 || foundPolicy.typeDetails[1] || '-')
-                setTypeDetailRd(foundPolicy.typeDetails.detail3 || foundPolicy.typeDetails[2] || '-')
-                setTypeDetail5Th(foundPolicy.typeDetails.detail5 || foundPolicy.typeDetails[4] || '-')
-                setPolicyVariant(foundPolicy.policyVariant || '-')
-                setPolicyConfirmDate(foundPolicy.policyConfirmDate || '-')
-                setPolicyDateSet(foundPolicy.policyDateSet)
-                setPolicyDateEnd(foundPolicy.policyDateEnd)
-                setPayment(foundPolicy.payment || '-')
-                setAmount(foundPolicy.amount || '-')
-                setInstallments(foundPolicy.installments || '-')
-                setNote(foundPolicy.policyNote)
+                setPolicy({
+                    policyNumber: foundPolicy.policyNumber,
+                    policyCompany: foundPolicy.policyCompany,
+                    policyType: foundPolicy.policyType,
+                    typeDetails: {
+                        detail1: foundPolicy.typeDetails.detail1,
+                        detail2: foundPolicy.typeDetails.detail2,
+                        detail3: foundPolicy.typeDetails.detail3,
+                        detail4: foundPolicy.typeDetails.detail4
+                    },
+                    policyVariant: foundPolicy.policyVariant,
+                    policyDateSet: foundPolicy.policyDateSet,
+                    policyDateEnd: foundPolicy.policyDateEnd,
+                    payment: foundPolicy.payment,
+                    amount: foundPolicy.amount,
+                    installments: foundPolicy.installments,
+                    note: foundPolicy.note,
+                    written: foundPolicy.written
+                })
+                setSubPolicy({
+                    policyNumber: foundPolicy.policyNumber,
+                    policyCompany: foundPolicy.policyCompany,
+                    policyType: foundPolicy.policyType,
+                    typeDetails: {
+                        detail1: foundPolicy.typeDetails.detail1,
+                        detail2: foundPolicy.typeDetails.detail2,
+                        detail3: foundPolicy.typeDetails.detail3,
+                        detail4: foundPolicy.typeDetails.detail4
+                    },
+                    policyVariant: foundPolicy.policyVariant,
+                    policyDateSet: foundPolicy.policyDateSet,
+                    policyDateEnd: foundPolicy.policyDateEnd,
+                    payment: foundPolicy.payment,
+                    amount: foundPolicy.amount,
+                    installments: foundPolicy.installments,
+                    note: foundPolicy.note,
+                    written: foundPolicy.written
+                })
 
-
-
-                setSubPolicyNumber(foundPolicy.policyNumber)
-                setSubCompany(foundPolicy.policyCompany || '-')
-                setSubPolicyType(foundPolicy.policyType || '-')
-                setSubTypeDetailSt(foundPolicy.typeDetails.detail1 || foundPolicy.typeDetails[0] || '-')
-                setSubTypeDetailNd(foundPolicy.typeDetails.detail2 || foundPolicy.typeDetails[1] || '-')
-                setSubTypeDetailRd(foundPolicy.typeDetails.detail3 || foundPolicy.typeDetails[2] || '-')
-                setSubTypeDetail5Th(foundPolicy.typeDetails.detail5 || foundPolicy.typeDetails[4] || '-')
-                setSubPolicyVariant(foundPolicy.policyVariant || '-')
-                setSubPolicyConfirmDate(foundPolicy.policyConfirmDate || '-')
-                setSubPolicyDateSet(foundPolicy.policyDateSet)
-                setSubPolicyDateEnd(foundPolicy.policyDateEnd)
-                setSubPayment(foundPolicy.payment || '-')
-                setSubAmount(foundPolicy.amount || '-')
-                setSubInstallments(foundPolicy.installments || '-')
-
-
-                setWritten(foundPolicy.written)
             } else {
                 dispatch(getSpecificClient({type: 'policy._id', value: params[0]}))
             }
@@ -145,41 +155,16 @@ const PolicyDetails = () => {
 
     const saveSubs = () => {
         const editedPolicy = {
-            policyNumber: subPolicyNumber,
-            policyCompany: (subCompany=='-' || null || undefined) ? null : subCompany, 
-            policyType: (subPolicyType=='-' || null || undefined) ? null : subPolicyType,
-            typeDetails: (subPolicyType=='komunikacyjna') ? 
-                [(subTypeDetailSt=='-' || null || undefined) ? null : subTypeDetailSt, (subTypeDetailNd=='-' || null || undefined) ? null : subTypeDetailNd, (subTypeDetailRd=='-' || null || undefined) ? null : subTypeDetailRd, null, (subTypeDetail5Th=='-' || null || undefined) ? null : subTypeDetail5Th] : 
-                [(subTypeDetailSt=='-' || null || undefined) ? null : subTypeDetailSt],
-            policyVariant: (subPolicyVariant=='-' || null || undefined) ? null : subPolicyVariant,
-            policyConfirmDate: (policyConfirmDate=='-' || null || undefined) ? null : policyConfirmDate,
-            policyDateSet: (subPolicyDateSet=='-' || null || undefined) ? null : subPolicyDateSet.toString(),
-            policyDateEnd: (subPolicyDateEnd=='-' || null || undefined) ? null : subPolicyDateEnd.toString(),
-            payment: (subPayment=='-' || null || undefined) ? null : subPayment,
-            amount: (subAmount=='-' || null || undefined) ? null : subAmount,
-            installments: (subInstallments=='-' || null || undefined) ? null : subInstallments,
-            written: (written === undefined) ? false : (written === false) ? false : true,
-            note: note || null
+            policyId,
+            ...subPolicy,
         }
-        dispatch(EDIT_POLICY({editedPolicy, policyNumber, id, policyId}))
+        setPolicy({...subPolicy})
+        dispatch(EDIT_POLICY({editedPolicy, id}))
         window.location.reload()
     }
 
     const clearSubs = () => {
-        setSubPolicyNumber(policyNumber)
-        setSubCompany(company)
-        setSubPolicyType(policyType)
-        setSubTypeDetailSt(typeDetailSt)
-        setSubTypeDetailNd(typeDetailNd)
-        setSubTypeDetailRd(typeDetailRd)
-        setSubTypeDetail5Th(typeDetail5Th)
-        setSubPolicyVariant(policyVariant)
-        setSubPolicyConfirmDate(policyConfirmDate)
-        setSubPolicyDateSet(policyDateSet)
-        setSubPolicyDateEnd(policyDateEnd)
-        setSubPayment(payment)
-        setSubAmount(amount)
-        setSubInstallments(installments)
+        setSubPolicy({...policy})
     } 
 
     const deletePolicy = (policyNumber) => {
@@ -187,79 +172,18 @@ const PolicyDetails = () => {
         window.location.href = '../policyList'
     }
 
-
-    const generatePdf = async (policyData) => {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${document.cookie.split('; ').map(v=>v.split('=').map(decodeURIComponent))[0][1]}`
-            },
-            body: JSON.stringify(policyData)
-        }
-
-        const readyPdf = await fetch(process.env.REACT_APP_PDFLINK, options)
-            .then(async () => {
-                const options2 = {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${document.cookie.split('; ').map(v=>v.split('=').map(decodeURIComponent))[0][1]}`
-                    }
-                }
-                const resolve = await fetch(process.env.REACT_APP_PDFLINK, options2)
-                    .then(res => res.blob())
-                    .then(res => {return res}) //tu będzie powrotny pdf
-                    .catch((err) => console.error(err))
-                return resolve
-            })
-            .then(res => {return res}) //tu musi być return powrotnego pdf
-            .catch((err) => console.error(err))
-
-        const pdfBlob = new Blob([readyPdf], {type: 'application/pdf'})
-        saveAs(pdfBlob, `${policyData.name}-${policyData.surname}-wypowiedzenie`)
-    }
-
-    const invertDate = (date) => {
-        let parseDate = new Date(date)
-        let day = parseDate.getDate()
-        let month = parseDate.getMonth()+1
-        let year = parseDate.getFullYear()
-
-        if (day < 10) {
-            day = '0' + day
-        }
-        if (month < 10) {
-            month = '0' + month
-        }
-
-        return `${day}-${month}-${year}` 
-    }
-
     const saveAsSpecific = (boolean) => {
         const editedPolicy = {
-            policyNumber: subPolicyNumber,
-            policyCompany: (subCompany=='-' || null || undefined) ? null : subCompany, 
-            policyType: (subPolicyType=='-' || null || undefined) ? null : subPolicyType,
-            typeDetails: (subPolicyType=='komunikacyjna') ? 
-                [(subTypeDetailSt=='-' || null || undefined) ? null : subTypeDetailSt, (subTypeDetailNd=='-' || null || undefined) ? null : subTypeDetailNd, (subTypeDetailRd=='-' || null || undefined) ? null : subTypeDetailRd, null, (subTypeDetail5Th=='-' || null || undefined) ? null : subTypeDetail5Th] : 
-                [(subTypeDetailSt=='-' || null || undefined) ? null : subTypeDetailSt],
-            policyVariant: (subPolicyVariant=='-' || null || undefined) ? null : subPolicyVariant,
-            policyConfirmDate: (policyConfirmDate=='-' || null || undefined) ? null : policyConfirmDate,
-            policyDateSet: (subPolicyDateSet=='-' || null || undefined) ? null : subPolicyDateSet.toString(),
-            policyDateEnd: (subPolicyDateEnd=='-' || null || undefined) ? null : subPolicyDateEnd.toString(),
-            payment: (subPayment=='-' || null || undefined) ? null : subPayment,
-            amount: (subAmount=='-' || null || undefined) ? null : subAmount,
-            installments: (subInstallments=='-' || null || undefined) ? null : subInstallments,
-            written: boolean,
-            note: note
+            policyId,
+            ...subPolicy,
+            written: boolean
         }
-        dispatch(EDIT_POLICY({editedPolicy, policyNumber, id, policyId}))
+        setPolicy({...subPolicy})
+        dispatch(EDIT_POLICY({editedPolicy, id}))
         window.location.reload()
     }
     
-    if (!policyNumber) {
+    if (!policy.policyNumber) {
         return (
             <>
                 <Navbar></Navbar>
@@ -277,7 +201,7 @@ const PolicyDetails = () => {
                     <div className='confirm-delete-cont'>
                         Czy na pewno chcesz usunąć polisę?
                         <div className='accept-container'>
-                            <div className='delete-btn-container' onClick={() => deletePolicy(policyNumber)}>
+                            <div className='delete-btn-container' onClick={() => deletePolicy(policy.policyNumber)}>
                                 <DeleteIcon style={{fontSize: 50}} className='accept-btn'></DeleteIcon>
                                 <span>Usuń Polisę</span>
                             </div>
@@ -294,18 +218,18 @@ const PolicyDetails = () => {
 
                 <section className='add-container'>
                     <article className='add-title'>
-                        <span>{policyNumber || 'numer polisy'}</span>
+                        <span>{policy.policyNumber || 'numer polisy'}</span>
                     </article>
                     <article className='add-section'>
                         <div className='add-section-title'>
                             <h1>Dane Polisy</h1> 
                         </div>      
                         <div className='add-section-forms'>
-                            <label><div className='edit-details'>{name || 'imie'}</div> <div>Imie*</div></label>
-                            <label><div className='edit-details'>{surname || 'nazwisko'}</div> <div>Nazwisko*</div></label>
-                            <label><input className='edit-details' onChange={(e) => setSubPolicyNumber(e.target.value)} value={subPolicyNumber}></input> <div>Numer*</div></label>
+                            <label><div className='edit-details'>{person.name}</div> <div>Imie</div></label>
+                            <label><div className='edit-details'>{person.surname}</div> <div>Nazwisko</div></label>
+                            <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, policyNumber: e.target.value})} value={subPolicy.policyNumber}></input> <div>Numer*</div></label>
                             <label>
-                                <select className='edit-details' value={subCompany} onChange={(e) => setSubCompany(e.target.value)}>
+                                <select className='edit-details' value={subPolicy.policyCompany} onChange={(e) => setSubPolicy({...subPolicy, policyCompany: e.target.value || ''})}>
                                     <option defaultValue></option>
                                     <option>Allianz</option>
                                     <option>Aviva</option>
@@ -333,13 +257,13 @@ const PolicyDetails = () => {
                                     <option>You Can Drive</option>
                                 </select> <div>Towarzystwo </div> 
                             </label> 
-                            <label><DatePicker className='edit-details' placeholderText='dzień-miesiąc-rok' onChange={(date) => setSubPolicyDateSet(date)} selected={new Date(subPolicyDateSet)} dateFormat="dd-MM-yyyy" required></DatePicker> <div>od*</div></label>
-                            <label><DatePicker className='edit-details' placeholderText='dzień-miesiąc-rok' onChange={(date) => setSubPolicyDateEnd(date)} selected={new Date(subPolicyDateEnd)} dateFormat="dd-MM-yyyy" required></DatePicker> <div>do*</div></label>
-                            <label><input className='edit-details' onChange={(e) => setSubPolicyVariant(e.target.value)} value={subPolicyVariant}></input> <div>Typ</div></label>
+                            <label><DatePicker className='edit-details' placeholderText='dzień-miesiąc-rok' onChange={(date) => setSubPolicy({...subPolicy, policyDateSet: computeDateToString(date, false)})} selected={computeStringToDate(subPolicy.policyDateSet)} dateFormat="dd-MM-yyyy" required></DatePicker> <div>od*</div></label>
+                            <label><DatePicker className='edit-details' placeholderText='dzień-miesiąc-rok' onChange={(date) => setSubPolicy({...subPolicy, policyDateEnd: computeDateToString(date, false)})} selected={computeStringToDate(subPolicy.policyDateEnd)} dateFormat="dd-MM-yyyy" required></DatePicker> <div>do*</div></label>
+                            <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, policyVariant: e.target.value})} value={subPolicy.policyVariant}></input> <div>Typ</div></label>
                         </div>  
                         <div className='add-section-forms'>
                             <label>
-                                <select className='edit-details' onChange={(e) => {setSubPolicyType(e.target.value); setSubTypeDetailSt(''); setSubTypeDetailNd(''); setSubTypeDetailRd(''); setSubTypeDetail5Th('')}} value={subPolicyType}>
+                                <select className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, policyType: e.target.value, typeDetails: {detail1: '', detail2: '', detail3: '', detail4: ''}})} value={subPolicy.policyType}>
                                     <option>komunikacyjna</option>
                                     <option>zdrowotna</option>
                                     <option>gospodarcza</option>
@@ -352,33 +276,32 @@ const PolicyDetails = () => {
                                 </select> <div>Rodzaj ubezpieczenia</div> 
                             </label>
                         </div>
-                        {subPolicyType == 'komunikacyjna' ?
+                        {subPolicy.policyType == 'komunikacyjna' ?
                             <div className='add-section-forms type-form'>
-                                <label><input className='edit-details' onChange={(e) => setSubTypeDetailSt(e.target.value)} value={subTypeDetailSt}></input> <div>Numer Rejestracyjny</div></label>
-                                <label><input className='edit-details' onChange={(e) => setSubTypeDetailNd(e.target.value)} value={subTypeDetailNd}></input> <div>Marka</div></label>
-                                <label><input className='edit-details' onChange={(e) => setSubTypeDetailRd(e.target.value)} value={subTypeDetailRd}></input> <div>Model</div></label>
+                                <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, typeDetails: {...subPolicy.typeDetails, detail1: e.target.value}})} value={subPolicy.typeDetails.detail1}></input> <div>Numer Rejestracyjny</div></label>
+                                <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, typeDetails: {...subPolicy.typeDetails, detail2: e.target.value}})} value={subPolicy.typeDetails.detail2}></input> <div>Marka</div></label>
+                                <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, typeDetails: {...subPolicy.typeDetails, detail3: e.target.value}})} value={subPolicy.typeDetails.detail3}></input> <div>Model</div></label>
                                 <label>
-                                    <select className='edit-details' onChange={(e) => setSubTypeDetail5Th(e.target.value)} value={subTypeDetail5Th}>
-                                        <option defaultValue></option>
-                                        <option>Osobowy</option>
+                                    <select className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, typeDetails: {...subPolicy.typeDetails, detail4: e.target.value}})} value={subPolicy.typeDetails.detail4}>
+                                        <option defaultValue>Osobowy</option>
                                         <option>Ciężarowy</option>
                                     </select> <div>Typ pojazdu</div> 
                                 </label>
                             </div> : 
                             <div className='add-section-forms type-form'>
-                                <label><input className='edit-details' onChange={(e) => setSubTypeDetailSt(e.target.value)} value={subTypeDetailSt}></input> <div>Szczegóły</div></label>
+                                <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, typeDetails: {...subPolicy.typeDetails, detail1: e.target.value}})} value={subPolicy.typeDetails.detail1}></input> <div>Szczegóły</div></label>
                             </div>
                         }
 
                         <div className='add-section-forms'>
                                 <label>
-                                    <select className='edit-details' onChange={(e) => setSubPayment(e.target.value)} value={subPayment}>
+                                    <select className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, payment: e.target.value})} value={subPolicy.payment}>
                                         <option>Gotówka</option>
                                         <option>Przelew</option>
                                     </select> <div>Płatność</div> 
                                 </label>
-                                <label><input className='edit-details' onChange={(e) => setSubAmount(e.target.value)} value={subAmount} type="number" min="1" step="any" ></input> <div>Kwota</div></label>
-                                <label><input className='edit-details' onChange={(e) => setSubInstallments(e.target.value)} value={subInstallments}></input> <div>Raty</div></label>
+                                <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, amount: e.target.value})} value={subPolicy.amount} type="number" min="1" step="any" ></input> <div>Kwota</div></label>
+                                <label><input className='edit-details' onChange={(e) => setSubPolicy({...subPolicy, installments: e.target.value})} value={subPolicy.installments}></input> <div>Raty</div></label>
                         </div>
 
 
@@ -413,39 +336,39 @@ const PolicyDetails = () => {
         <Navbar></Navbar>
         <section className='add-container'>
             <article className='add-title'>
-                <span>{policyNumber || 'numer polisy'}</span>
+                <span>{policy.policyNumber}</span>
             </article>
             <article className='add-section'>
                 <div className='add-section-title'>
                     <h1>Dane Polisy</h1> 
                 </div>      
                 <div className='add-section-forms'>
-                    <label><div className='edit-details'>{name || 'imie'}</div> <div>Imie*</div></label>
-                    <label><div className='edit-details'>{surname || 'nazwisko'}</div> <div>Nazwisko*</div></label>
-                    <label><div className='edit-details'>{policyNumber || 'numer polisy'}</div> <div>Numer*</div></label>
-                    <label><div className='edit-details'>{company || '-'}</div> <div>Towarzystwo</div></label>
-                    <label><div className='edit-details'>{invertDate(policyDateSet) || '-'}</div> <div>od*</div></label>
-                    <label><div className='edit-details'>{invertDate(policyDateEnd) || '-'}</div> <div>do*</div></label>
-                    <label><div className='edit-details'>{policyVariant || '-'}</div> <div>Typ</div></label>
+                    <label><div className='edit-details'>{person.name || '-'}</div> <div>Imie*</div></label>
+                    <label><div className='edit-details'>{person.surname || '-'}</div> <div>Nazwisko*</div></label>
+                    <label><div className='edit-details'>{policy.policyNumber || '-'}</div> <div>Numer*</div></label>
+                    <label><div className='edit-details'>{policy.policyCompany || '-'}</div> <div>Towarzystwo</div></label>
+                    <label><div className='edit-details'>{addMonth(policy.policyDateSet) || '-'}</div> <div>od*</div></label>
+                    <label><div className='edit-details'>{addMonth(policy.policyDateEnd) || '-'}</div> <div>do*</div></label>
+                    <label><div className='edit-details'>{policy.policyVariant || '-'}</div> <div>Typ</div></label>
                 </div>  
                 <div className='add-section-forms'>
-                    <label><div className='edit-details'>{policyType || '-'}</div> <div>Rodzaj ubezpieczenia</div></label>
+                    <label><div className='edit-details'>{policy.policyType || '-'}</div> <div>Rodzaj ubezpieczenia</div></label>
                 </div>
-                {policyType == 'komunikacyjna' ?
+                {policy.policyType == 'komunikacyjna' ?
                     <div className='add-section-forms type-form'>
-                        <label><div className='edit-details'>{typeDetailSt || '-'}</div> <div>Numer Rejestracyjny</div></label>
-                        <label><div className='edit-details'>{typeDetailNd || '-'}</div> <div>Marka</div></label>
-                        <label><div className='edit-details'>{typeDetailRd || '-'}</div> <div>Model</div></label>
-                        <label><div className='edit-details'>{typeDetail5Th || '-'}</div> <div>Typ pojazdu</div></label>
+                        <label><div className='edit-details'>{policy.typeDetails.detail1 || '-'}</div> <div>Numer Rejestracyjny</div></label>
+                        <label><div className='edit-details'>{policy.typeDetails.detail2 || '-'}</div> <div>Marka</div></label>
+                        <label><div className='edit-details'>{policy.typeDetails.detail3 || '-'}</div> <div>Model</div></label>
+                        <label><div className='edit-details'>{policy.typeDetails.detail4 || '-'}</div> <div>Typ pojazdu</div></label>
                     </div> : 
                     <div className='add-section-forms type-form'>
-                        <label><div className='edit-details'>{typeDetailSt || '-'}</div> <div>Szczegóły</div></label>
+                        <label><div className='edit-details'>{policy.typeDetails.detail1 || '-'}</div> <div>Szczegóły</div></label>
                     </div>
                 }
                 <div className='add-section-forms'>
-                    <label><div className='edit-details'>{payment || '-'}</div> <div>Płatność</div></label>
-                    <label><div className='edit-details'>{amount + ' zł' || '-'}</div> <div>Kwota</div></label>
-                    <label><div className='edit-details'>{installments  || '-'}</div> <div>Raty</div></label>
+                    <label><div className='edit-details'>{policy.payment || '-'}</div> <div>Płatność</div></label>
+                    <label><div className='edit-details'>{policy.amount + ' zł' || '-'}</div> <div>Kwota</div></label>
+                    <label><div className='edit-details'>{policy.installments  || '-'}</div> <div>Raty</div></label>
                 </div>
 
 
@@ -472,7 +395,15 @@ const PolicyDetails = () => {
                     </div>
                 </div> 
                 <div className='accept-container'>
-                    <div className='accept-btn-container' onClick={() => generatePdf({name, surname, address, company, typeDetailSt, typeDetailNd, typeDetailRd, policyNumber, policyDateSet, policyDateEnd, policyType})}>
+                    <div className='accept-btn-container' onClick={() => generatePdf({name: person.name, 
+                                                                                    surname: person.surname, 
+                                                                                    address: person.address, 
+                                                                                    company: policy.company, 
+                                                                                    typeDetails: policy.typeDetails, 
+                                                                                    policyNumber: policy.policyNumber, 
+                                                                                    policyDateSet: policy.policyDateSet, 
+                                                                                    policyDateEnd: policy.policyDateEnd, 
+                                                                                    policyType: policy.policyType})}>
                         <DescriptionIcon style={{fontSize: 50}} className='accept-btn'></DescriptionIcon>
                         <span>Wypowiedzenie</span>
                     </div>

@@ -1,6 +1,5 @@
 const express = require('express')
 const apiSMS = require('smsapi')
-//import { SMSAPI, MessageResponse } from 'smsapi';
 
 const router = express.Router()
 
@@ -26,12 +25,11 @@ router.post('/', (req, res) => {
 
     const response = async (phoneNumber, message) => {
         try {
-            return await smsToken.sms.sendSms(`+48${phoneNumber}`, `${message}`, 'A. Sawicka') //3 parametr to pole nadawcy chyba generalnie
+            // return await smsToken.sms.sendSms(`+48${phoneNumber}`, `${message}`)
+            console.log('wysłany sms')
         } catch {
             console.log('error')
         }
-         
-        // komentarzować jak testuje żeby nie zżerało kasy
     }
     response(phoneNumber, message)
 

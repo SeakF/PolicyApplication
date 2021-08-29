@@ -1,6 +1,5 @@
 const express = require('express')
 const User = require('../../models/User')
-const Company = require('../../models/Company')
 
 const router = express.Router()
 
@@ -20,7 +19,7 @@ router.put('/', (req, res) => {
     } else {
         User.find()
             .skip(((req.body.numberOfClients-req.body.n)<=0)?0:req.body.numberOfClients-req.body.n)
-            .limit(20+req.body.n) //.limit((allPolicies) ? 0 : 20)
+            .limit(20+req.body.n)
             .then((result) => {
                 res.send(result)
             })
@@ -77,73 +76,18 @@ router.post('/specific', (req, res) => {
 // create a client    
 // route POST api/items
 router.post('/', (req, res) => {
-    if (req.body.clientCompany) {
-        if (req.body.policy[0]) {
-            const newCompany = new Company({
-                clientCompany: req.body.clientCompany,
-                nip: req.body.nip,
-                name: req.body.name, 
-                surname: req.body.surname,
-                pesel: req.body.pesel,
-                phoneNumber: req.body.phoneNumber,
-                address: req.body.address,
-                email: req.body.email,
-                conjugateName: req.body.conjugateName,
-                policy: [
-                    {
-                        policyNumber: req.body.policy[0].policyNumber,
-                        policyCompany: req.body.policy[0].policyCompany,
-                        policyType: req.body.policy[0].policyType,
-                        policyDetails: req.body.policy[0].policyDetails,
-                        typeDetails: {
-                            detail1: req.body.policy[0].typeDetails[0],
-                            detail2: req.body.policy[0].typeDetails[1],
-                            detail3: req.body.policy[0].typeDetails[2],
-                            detail4: req.body.policy[0].typeDetails[3],
-                            detail5: req.body.policy[0].typeDetails[4]
-                        },
-                        policyVariant: req.body.policy[0].policyVariant,
-                        policyConfirmDate: req.body.policy[0].policyConfirmDate,
-                        policyDateSet: req.body.policy[0].policyDateSet,
-                        policyDateEnd: req.body.policy[0].policyDateEnd,
-                        payment: req.body.policy[0].payment,
-                        amount: req.body.policy[0].amount,
-                        installments: req.body.policy[0].installments,
-                        written: req.body.written
-                    }   
-                ]
-            })
-
-            newCompany.save().then(company => res.json(company))
-        } else {
-            const newCompany = new Company({
-                clientCompany: req.body.clientCompany,
-                nip: req.body.nip,
-                name: req.body.name, 
-                surname: req.body.surname,
-                pesel: req.body.pesel,
-                phoneNumber: req.body.phoneNumber,
-                address: req.body.address,
-                email: req.body.email,
-                conjugateName: req.body.conjugateName,
-                policy: []
-            })    
-            newCompany.save().then(company => res.json(company))   
-        }
-
-
-
-
-    } else {
         if (req.body.policy[0]) {
             const newUser = new User({
                 name: req.body.name, 
                 surname: req.body.surname,
+                clientCompany: req.body.clientCompany,
+                nip: req.body.nip,
                 pesel: req.body.pesel,
                 phoneNumber: req.body.phoneNumber,
                 address: req.body.address,
                 email: req.body.email,
                 conjugateName: req.body.conjugateName,
+                clientNote: req.body.clientNote,
                 policy: [
                     {
                         policyNumber: req.body.policy[0].policyNumber,
@@ -151,20 +95,18 @@ router.post('/', (req, res) => {
                         policyType: req.body.policy[0].policyType,
                         policyDetails: req.body.policy[0].policyDetails,
                         typeDetails: {
-                            detail1: req.body.policy[0].typeDetails[0],
-                            detail2: req.body.policy[0].typeDetails[1],
-                            detail3: req.body.policy[0].typeDetails[2],
-                            detail4: req.body.policy[0].typeDetails[3],
-                            detail5: req.body.policy[0].typeDetails[4]
+                            detail1: req.body.policy[0].typeDetails.detail1,
+                            detail2: req.body.policy[0].typeDetails.detail2,
+                            detail3: req.body.policy[0].typeDetails.detail3,
+                            detail4: req.body.policy[0].typeDetails.detail4
                         },
                         policyVariant: req.body.policy[0].policyVariant,
-                        policyConfirmDate: req.body.policy[0].policyConfirmDate,
                         policyDateSet: req.body.policy[0].policyDateSet,
                         policyDateEnd: req.body.policy[0].policyDateEnd,
                         payment: req.body.policy[0].payment,
                         amount: req.body.policy[0].amount,
                         installments: req.body.policy[0].installments,
-                        written: req.body.written
+                        written: req.body.policy[0].written
                     }   
                 ]
             })
@@ -174,17 +116,18 @@ router.post('/', (req, res) => {
             const newUser = new User({
                 name: req.body.name, 
                 surname: req.body.surname,
+                clientCompany: req.body.clientCompany,
+                nip: req.body.nip,
                 pesel: req.body.pesel,
                 phoneNumber: req.body.phoneNumber,
                 address: req.body.address,
                 email: req.body.email,
                 conjugateName: req.body.conjugateName,
+                clientNote: req.body.clientNote,
                 policy: []
             })    
             newUser.save().then(user => res.json(user))    
         }
-    }
-    
 })
 
 // create a policy
@@ -196,19 +139,18 @@ router.post('/policy/:id', (req, res) => {
                     policyType: req.body.policyType,
                     policyDetails: req.body.policyDetails,
                     typeDetails: {
-                        detail1: req.body.typeDetails[0],
-                        detail2: req.body.typeDetails[1],
-                        detail3: req.body.typeDetails[2],
-                        detail4: req.body.typeDetails[3],
-                        detail5: req.body.typeDetails[4]
+                        detail1: req.body.typeDetails.detail1,
+                        detail2: req.body.typeDetails.detail2,
+                        detail3: req.body.typeDetails.detail3,
+                        detail4: req.body.typeDetails.detail4
                     },
                     policyVariant: req.body.policyVariant,
-                    policyConfirmDate: req.body.policyConfirmDate,
                     policyDateSet: req.body.policyDateSet,
                     policyDateEnd: req.body.policyDateEnd,
                     payment: req.body.payment,
                     amount: req.body.amount,
                     installments: req.body.installments,
+                    policyNote: req.body.policyNote,
                     written: req.body.written        
     }}})
         .catch(err => res.status(404).send({error: 'user not found'}))
@@ -239,36 +181,20 @@ router.delete('/policy/:id', (req, res) => {
 // edit an user
 // route api/items/id
 router.put('/:id', (req, res) => {
-    if (req.body.clientCompany) {
-        User.findById(req.params.id)
-            .then(user => user.updateOne({
-                clientCompany: req.body.clientCompany, 
-                nip: req.body.nip, 
-                name: req.body.name, 
-                surname: req.body.surname, 
-                pesel: req.body.pesel,
-                phoneNumber: req.body.phoneNumber,
-                address: req.body.address,
-                email: req.body.email,
-                conjugateName: req.body.conjugateName,
-                clientNote: req.body.note
-            }))
-            .catch(err => res.status(404).send({error: 'user not found by id'}))
-    } else {
-        User.findById(req.params.id)
-            .then(user => user.updateOne({
-                name: req.body.name, 
-                surname: req.body.surname, 
-                pesel: req.body.pesel,
-                phoneNumber: req.body.phoneNumber,
-                address: req.body.address,
-                email: req.body.email,
-                conjugateName: req.body.conjugateName,
-                clientNote: req.body.note
-            }))
-            .catch(err => res.status(404).send({error: 'user not found by id'}))    
-    }
-    
+    User.findById(req.params.id)
+        .then(user => user.updateOne({
+            name: req.body.name, 
+            surname: req.body.surname, 
+            pesel: req.body.pesel,
+            clientCompany: req.body.clientCompany, 
+            nip: req.body.nip, 
+            phoneNumber: req.body.phoneNumber,
+            address: req.body.address,
+            email: req.body.email,
+            conjugateName: req.body.conjugateName,
+            clientNote: req.body.clientNote
+        }))
+        .catch(err => res.status(404).send({error: 'user not found by id'}))
 })
 
 // edit a policy
@@ -281,38 +207,17 @@ router.put('/policy/:id', (req, res) => {
                 'policy.$.policyNumber': req.body.policyNumber,
                 'policy.$.policyCompany': req.body.policyCompany,
                 'policy.$.policyType': req.body.policyType,
-                'policy.$.typeDetails.detail1': req.body.typeDetails[0],
-                'policy.$.typeDetails.detail2': req.body.typeDetails[1],
-                'policy.$.typeDetails.detail3': req.body.typeDetails[2],
-                'policy.$.typeDetails.detail4': req.body.typeDetails[3],
-                'policy.$.typeDetails.detail5': req.body.typeDetails[4],
+                'policy.$.typeDetails.detail1': req.body.typeDetails.detail1,
+                'policy.$.typeDetails.detail2': req.body.typeDetails.detail2,
+                'policy.$.typeDetails.detail3': req.body.typeDetails.detail3,
+                'policy.$.typeDetails.detail4': req.body.typeDetails.detail4,
                 'policy.$.policyVariant': req.body.policyVariant,
                 'policy.$.policyDateSet': req.body.policyDateSet,
                 'policy.$.policyDateEnd': req.body.policyDateEnd,
                 'policy.$.payment': req.body.payment,
                 'policy.$.amount': req.body.amount,
                 'policy.$.installments': req.body.installments,
-                'policy.$.policyNote': req.body.note,
-                'policy.$.written': req.body.written
-            }
-        }, (err) => {
-            if (err) console.log(err)
-        })
-    } else if (req.body.policyType && req.body.policyType != 'komunikacyjna') {
-        User.findOneAndUpdate({'policy._id': req.params.id},
-        {
-            $set: {
-                'policy.$.policyNumber': req.body.policyNumber,
-                'policy.$.policyCompany': req.body.policyCompany,
-                'policy.$.policyType': req.body.policyType,
-                'policy.$.typeDetails.detail1': req.body.typeDetails[0],
-                'policy.$.policyVariant': req.body.policyVariant,
-                'policy.$.policyDateSet': req.body.policyDateSet,
-                'policy.$.policyDateEnd': req.body.policyDateEnd,
-                'policy.$.payment': req.body.payment,
-                'policy.$.amount': req.body.amount,
-                'policy.$.installments': req.body.installments,
-                'policy.$.policyNote': req.body.note,
+                'policy.$.policyNote': req.body.policyNote,
                 'policy.$.written': req.body.written
             }
         }, (err) => {
@@ -325,14 +230,14 @@ router.put('/policy/:id', (req, res) => {
                 'policy.$.policyNumber': req.body.policyNumber,
                 'policy.$.policyCompany': req.body.policyCompany,
                 'policy.$.policyType': req.body.policyType,
-                'policy.$.typeDetails.detail1': req.body.typeDetails[0],
+                'policy.$.typeDetails.detail1': req.body.typeDetails.detail1,
                 'policy.$.policyVariant': req.body.policyVariant,
                 'policy.$.policyDateSet': req.body.policyDateSet,
                 'policy.$.policyDateEnd': req.body.policyDateEnd,
                 'policy.$.payment': req.body.payment,
                 'policy.$.amount': req.body.amount,
                 'policy.$.installments': req.body.installments,
-                'policy.$.policyNote': req.body.note,
+                'policy.$.policyNote': req.body.policyNote,
                 'policy.$.written': req.body.written
             }
         }, (err) => {
@@ -342,8 +247,5 @@ router.put('/policy/:id', (req, res) => {
 
 
 })
-//policyCompany, policyType, typeDetails, 
-//policyVariant, policyConfirmDate, policyDateSet, 
-//policyDateEnd, payment, amount, installments
 
 module.exports = router

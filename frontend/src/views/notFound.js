@@ -1,7 +1,7 @@
 import React from 'react'
 import '../styles/addStyles.css'
 import {Link} from 'react-router-dom'
-import Navbar from '../components/navbar'
+import Navbar from '../components/Navbar'
 
 const NotFound = () => {
     return (

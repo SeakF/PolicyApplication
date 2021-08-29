@@ -2,7 +2,7 @@ import React from 'react'
 import Login from './views/login'
 import { AuthProvider } from './context/AuthContext'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
-import PrivateRoute from './components/privateRoute'
+import PrivateRoute from './components/PrivateRoute'
 
 import Home from './views/home'
 import PolicyList from './views/policyList'

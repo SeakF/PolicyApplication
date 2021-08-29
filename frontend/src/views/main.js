@@ -1,10 +1,9 @@
 import React, {useEffect} from "react";
-import {BrowserRouter as Router ,Switch, Route} from 'react-router-dom'
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { getClients } from '../features/clients/clients'
-import { useAuth } from '../context/AuthContext'
 
-import Navbar from '../components/navbar'
+import Navbar from '../components/Navbar'
 
 import Home from './home'
 import PolicyList from './policyList'

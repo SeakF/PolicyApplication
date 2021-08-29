@@ -131,7 +131,7 @@ const editPolicy = async (editedPolicy, id) => {
 }
 
 
-// dodać state odpowiadający za błąd
+
 //===========redux============
 export const listClients = createSlice({
   name: 'editClientList',
@@ -142,7 +142,8 @@ export const listClients = createSlice({
     status: null
   },
   reducers: {
-    ADD_POLICY_AND_CLIENT: (state, action) => { //done
+    ADD_POLICY_AND_CLIENT: (state, action) => { 
+      console.log(action.payload)
       if (!isPolicyExist(state.clients, action.payload.policy[0].policyNumber)) {
         state.clients = [...state.clients, action.payload]
         uploadClient(action.payload)
@@ -154,7 +155,7 @@ export const listClients = createSlice({
     },
 
 
-    ADD_POLICY: (state, action) => { //done // tu może być jakiś problem bo usunąłem dopiero dodawanie customowego id to zobaczymy
+    ADD_POLICY: (state, action) => {
       const clientId = action.payload.predefinedId || action.payload.existingClientId
       const newPolicy = action.payload.onlyNewPolicy
 
@@ -177,13 +178,13 @@ export const listClients = createSlice({
     },
 
 
-    ADD_CLIENT: (state, action) => { //done
+    ADD_CLIENT: (state, action) => {
       state.clients = [...state.clients, action.payload]
       uploadClient(action.payload)
     },
 
 
-    DELETE_POLICY: (state, action) => { //done
+    DELETE_POLICY: (state, action) => {
       const policyForDelete = action.payload.policyNumber
       const clientWithPolicyForDelete = action.payload.id
       const policyId = action.payload.policyId
@@ -202,7 +203,7 @@ export const listClients = createSlice({
     },
 
 
-    DELETE_CLIENT: (state, action) => { //done
+    DELETE_CLIENT: (state, action) => {
       const clientForDelete = action.payload
       if (state.clients.find((client) => client._id === clientForDelete)) {
         const filtered = state.clients.filter((client) => client._id !== clientForDelete) 
@@ -213,16 +214,16 @@ export const listClients = createSlice({
       }
     },
 
-    EDIT_POLICY: (state, action) => { //done ;-;
+    EDIT_POLICY: (state, action) => {
         const editedPolicy = action.payload.editedPolicy
-        const oldPolicyNumber = action.payload.policyNumber
+        const oldPolicyNumber = action.payload.editedPolicy.policyNumber
         const clientWithPolicyToEdit = action.payload.id
-        const policyId = action.payload.policyId
-        const {policyNumber, policyCompany, policyType, typeDetails, policyVariant, policyConfirmDate, policyDateSet, policyDateEnd, payment, amount, installments} = editedPolicy
+        const policyId = action.payload.editedPolicy.policyId
+        const {policyNumber, policyCompany, policyType, typeDetails, policyVariant, policyConfirmDate, policyDateSet, policyDateEnd, payment, amount, installments, policyNote, written} = editedPolicy
         if (state.clients.find((client) => client._id === clientWithPolicyToEdit) && (oldPolicyNumber === editedPolicy.policyNumber || !isPolicyExist(state.clients, editedPolicy.policyNumber))) {
           let foundClient = state.clients.find((client) => client._id === clientWithPolicyToEdit)
           let foundPolicy = foundClient.policy.find((policy) => policy._id === policyId)
-          foundPolicy = {...foundPolicy, policyNumber, policyCompany, policyType, typeDetails: [typeDetails[0], typeDetails[1], typeDetails[2], typeDetails[3], typeDetails[4]], policyVariant, policyConfirmDate, policyDateSet, policyDateEnd, payment, amount, installments, policyNote: editedPolicy.note, written: editedPolicy.written}
+          foundPolicy = {...foundPolicy, policyNumber, policyCompany, policyType, typeDetails: {...typeDetails}, policyVariant, policyConfirmDate, policyDateSet, policyDateEnd, payment, amount, installments, policyNote, written}
           
           let filteredClient = foundClient.policy.filter((policy) => policy._id !== policyId)
           foundClient.policy = [...filteredClient, foundPolicy]
@@ -242,30 +243,21 @@ export const listClients = createSlice({
         }
     }, 
 
-    EDIT_CLIENT: (state, action) => { //done
+    EDIT_CLIENT: (state, action) => {
       const editedClient = action.payload
-      const {id, clientCompany, nip, name, surname, pesel, phoneNumber, address, email, conjugateName} = editedClient
+      const {id, clientCompany, nip, name, surname, pesel, phoneNumber, address, email, conjugateName, clientNote} = editedClient
       if (state.clients.find((client) => client._id === id)) {
         let found = state.clients.find((client) => client._id === id)
-        if (found.clientCompany) {
-          found = {...found, clientCompany, nip, name, surname, pesel, phoneNumber, address, email, clientNote: editedClient.note}
+          found = {...found, clientCompany, nip, name, surname, pesel, phoneNumber, address, email, conjugateName, clientNote}
           const filtered = state.clients.filter((client) => client._id !== id)
           state.clients = [...filtered, found]
           editClient(editedClient)
-
-        } else {
-          found = {...found, name, surname, pesel, phoneNumber, address, email, conjugateName, clientNote: editedClient.note}
-          const filtered = state.clients.filter((client) => client._id !== id)
-          state.clients = [...filtered, found]
-          editClient(editedClient)
-        }
-        
       } else {
         console.error('jakiś błąd, "nie ma takiego klienta"')
       }
     },
 
-    CHANGE_STATUS: (state) => { //done
+    CHANGE_STATUS: (state) => {
       state.status = null
     }
   },

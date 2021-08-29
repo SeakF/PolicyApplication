@@ -2,9 +2,6 @@ import '../styles/loading.css'
 
 
 const Loading = () => {
-    
-
-
     return (
     <>
         <article className='loading-screen'>

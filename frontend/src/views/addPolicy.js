@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react"
 import {useLocation} from 'react-router-dom'
-import ErrorWindow from '../components/errorWindow'
+import ErrorWindow from '../components/ErrorWindow'
 import '../styles/addStyles.css'
 import NoteAddIcon from '@material-ui/icons/NoteAdd'
 import { useSelector, useDispatch } from 'react-redux'
+import { computeDateToString, computeStringToDate } from '../features/functions/functions'
 import { ADD_POLICY_AND_CLIENT, ADD_POLICY, selectClient, statusState, CHANGE_STATUS, getSpecificClient } from '../features/clients/clients'
-import Navbar from '../components/navbar'
+import Navbar from '../components/Navbar'
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
@@ -23,7 +24,50 @@ const AddPolicy = () => {
     const [predefinedName, setPredefinedName] = useState('')
     const [predefinedSurname, setPredefinedSurname] = useState('')
     const [predefinedClientCompany, setPredefinedClientCompany] = useState('')
-    const [written, setWritten] = useState(true)
+
+
+    const [isNewClient, setIsNewClient] = useState(false)
+    const [existingClientId, setExistingClientId] = useState('')
+
+    const [person, setPerson] = useState({
+        name: '',
+        surname: '',
+        pesel: '',
+        phoneNumber: '',
+        address: '',
+        email: '',
+        conjugateName: '',
+        clientIsPerson: true,
+        clientCompany: '',
+        nip: '',
+        policy: []
+    })
+
+    const [policy, setPolicy] = useState({
+        policyNumber: '',
+        policyCompany: '',
+        policyType: 'komunikacyjna',
+        typeDetails: {
+            detail1: '',
+            detail2: '',
+            detail3: '',
+            detail4: ''
+        },
+        policyVariant: '',
+        policyDateSet: '',
+        policyDateEnd: '',
+        payment: 'Gotówka',
+        amount: '',
+        installments: 'Jednorazowo',
+        policyNote: '',
+        written: true
+    })
+
+    const [search, setSearch] = useState({
+        name: '',
+        surname: '',
+        clientCompany: ''
+    })
 
     useEffect(() => {
         if (location.state) {
@@ -31,158 +75,39 @@ const AddPolicy = () => {
             setPredefinedName(location.state.name)
             setPredefinedSurname(location.state.surname)
             setPredefinedClientCompany(location.state.clientCompany)
-            setWritten(location.state.written)
+            setPolicy({...policy, written: location.state.written})
         }
     }, [])
     
-
-    const [isNewClient, setIsNewClient] = useState(false)
-    const [existingClientId, setExistingClientId] = useState('')
-
-
-
-
-
-
-    const [name, setName] = useState('')
-    const [surname, setSurname] = useState('')
-    const [pesel, setPesel] = useState('')
-    const [phoneNumber, setPhoneNumber] = useState('')
-    const [address, setAddress] = useState('')
-    const [email, setEmail] = useState('')
-    const [conjugateName, setConjugateName] = useState('')
-
-
-    const [policyNumber, setPolicyNumber] = useState('')
-    const [policyCompany, setPolicyCompany] = useState('')
-
-    const [policyType, setPolicyType] = useState('komunikacyjna')
-    const [typeDetailSt, setTypeDetailsSt] = useState('')
-    const [typeDetailNd, setTypeDetailsNd] = useState('')
-    const [typeDetailRd, setTypeDetailsRd] = useState('')
-    const [typeDetailTh, setTypeDetailsTh] = useState('')
-    const [typeDetail5Th, setTypeDetails5Th] = useState('')
-    const [policyVariant, setPolicyVariant] = useState('')
-
-    const [policyConfirmDate, setPolicyConfirmDate] = useState('')
-    const [policyDateSet, setPolicyDateSet] = useState(null)
-    const [policyDateEnd, setPolicyDateEnd] = useState(null)
-
-    const [payment, setPayment] = useState('Gotówka')
-    const [amount, setAmount] = useState('')
-    const [installments, setInstallments] = useState('Jednorazowo')
-
-
-    const [clientIsPerson, setClientIsPerson] = useState(true)
-
-    const [clientCompany, setClientCompany] = useState('')
-    const [nip, setNip] = useState('')
-
-    
     const handleSubmit = (e) => {
         e.preventDefault()
-        if (((name && surname) || clientCompany) && policyNumber && isNewClient) {
-            if (clientIsPerson) {
-                const newPolicy = {
-                    name,
-                    surname,
-                    pesel: pesel || null,
-                    phoneNumber: phoneNumber || null,
-                    address: address || null,
-                    email: email || null,
-                    conjugateName: conjugateName || null,
-                    policy: [
-                        {
-                            policyNumber,
-                            policyCompany: policyCompany || null,
-                            policyType,
-                            typeDetails: (policyType=='komunikacyjna') ? 
-                                [typeDetailSt || null, typeDetailNd || null, typeDetailRd || null, null, typeDetail5Th || null] : 
-                                [typeDetailSt || null],
-                            policyVariant: policyVariant || null,
-                            policyConfirmDate: policyConfirmDate || null,
-                            policyDateSet: policyDateSet.toString(),
-                            policyDateEnd: policyDateEnd.toString(),
-                            payment,
-                            amount: amount || null,
-                            installments: installments || null,
-                            written
-                        }
-                    ]
-                }
-                dispatch(ADD_POLICY_AND_CLIENT(newPolicy))
-            } else if (!clientIsPerson) {
-                const newPolicy = {
-                    clientCompany,
-                    nip: nip || null,
-                    name: name || null,
-                    surname: surname || null,
-                    pesel: pesel || null,
-                    phoneNumber: phoneNumber || null,
-                    address: address || null,
-                    email: email || null,
-                    conjugateName: conjugateName || null,
-                    policy: [
-                        {
-                            policyNumber,
-                            policyCompany: policyCompany || null,
-                            policyType,
-                            typeDetails: (policyType=='komunikacyjna') ? 
-                                [typeDetailSt || null, typeDetailNd || null, typeDetailRd || null, null, typeDetail5Th || null] : 
-                                [typeDetailSt || null],
-                            policyVariant: policyVariant || null,
-                            policyConfirmDate: policyConfirmDate || null,
-                            policyDateSet: policyDateSet.toString(),
-                            policyDateEnd: policyDateEnd.toString(),
-                            payment,
-                            amount: amount || null,
-                            installments: installments || null,
-                            written
-                        }
-                    ]
-                }
-                dispatch(ADD_POLICY_AND_CLIENT(newPolicy))
-            } else {
-                console.log('uzupełnij dane')
+        if (isNewClient) {
+            const newPolicy = {
+                ...person,
+                policy: [
+                    {...policy}
+                ]
             }
-            
+            dispatch(ADD_POLICY_AND_CLIENT(newPolicy))
         } else if (!isNewClient) {
-            const onlyNewPolicy = {
-                        policyNumber,
-                        policyCompany: policyCompany || null,
-                        policyType,
-                        typeDetails: (policyType=='komunikacyjna') ? 
-                            [typeDetailSt || null, typeDetailNd || null, typeDetailRd || null, null, typeDetail5Th || null] : 
-                            [typeDetailSt || null],
-                        policyVariant: policyVariant || null,
-                        policyConfirmDate: policyConfirmDate || null,
-                        policyDateSet: policyDateSet.toString(),
-                        policyDateEnd: policyDateEnd.toString(),
-                        payment,
-                        amount: amount || null,
-                        installments: installments || null,
-                        written
-                    }
+            const onlyNewPolicy = {...policy}
             if (existingClientId) {
                 dispatch(ADD_POLICY({onlyNewPolicy, existingClientId}))
             } else {
                 dispatch(ADD_POLICY({onlyNewPolicy, predefinedId}))
             }
-        } else {
-            console.log('uzupełnij dane')
         }
     }
 
-    const capitalizeStLetter = (word) => {
-        return word && word[0].toUpperCase() + word.slice(1);
-    }
-
-    const computeDate = (date) => {
-        return new Date(date.getFullYear()+1, date.getMonth(), date.getDate()-1)
+    const clearProps = (object) => {
+        for (const key in object) {
+            if (key != 'clientIsPerson' && key != 'policy') object[key] = ''
+        }
+        return object
     }
 
     if (status == 'success') {
-        if (written === false) {
+        if (policy.written === false) {
             dispatch(CHANGE_STATUS()) 
             window.location.href = `../views/clientDetails/${predefinedId}`
         } else {
@@ -223,32 +148,32 @@ const AddPolicy = () => {
                 { isNewClient ? 
                 <>
                 <div className='add-section-forms'>
-                    <div className='add-section-forms-radio'><input type="radio" name='choseClientStatus' onClick={() => setClientIsPerson(true)} defaultChecked/> Osoba prywatna</div>
-                    <div className='add-section-forms-radio'><input type="radio" name='choseClientStatus' onClick={() => setClientIsPerson(false)}/> Firma</div>
+                    <div className='add-section-forms-radio'><input type="radio" name='choseClientStatus' onClick={() => {setPerson(clearProps(person)); setPerson({...person, clientIsPerson: true});}} defaultChecked/> Osoba prywatna</div>
+                    <div className='add-section-forms-radio'><input type="radio" name='choseClientStatus' onClick={() => {setPerson(clearProps(person)); setPerson({...person, clientIsPerson: false});}}/> Firma</div>
                 </div> 
                 <div className='add-section-forms'>
-                    {clientIsPerson ? 
+                    {person.clientIsPerson ? 
 
                     <>
-                        <label><input className='input-label' value={name} onChange={(e) => setName(capitalizeStLetter(e.target.value))} type="text" required /> <div>Imie*</div></label>
-                        <label><input className='input-label' value={surname} onChange={(e) => setSurname(capitalizeStLetter(e.target.value))} type="text" required /> <div>Nazwisko*</div></label>
-                        <label><input className='input-label' value={pesel} onChange={(e) => setPesel(e.target.value)} type="text" /> <div>Pesel</div></label>
-                        <label><input className='input-label' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} type="text" /> <div>Numer Telefonu</div></label>
-                        <label><input className='input-label' value={address} onChange={(e) => setAddress(e.target.value)} type="text" /> <div>Adres</div></label>
-                        <label><input className='input-label' value={email} onChange={(e) => setEmail(e.target.value)} type="text" /> <div>Email</div></label>
-                        <label><input className='input-label' value={conjugateName} onChange={(e) => setConjugateName(e.target.value)} type="text" /> <div>Odmiana (np. Panie "Ryszardzie")</div></label>
+                        <label><input className='input-label' value={person.name} onChange={(e) => setPerson({...person, name: e.target.value})} type="text" required /> <div>Imie*</div></label>
+                        <label><input className='input-label' value={person.surname} onChange={(e) => setPerson({...person, surname: e.target.value})} type="text" required /> <div>Nazwisko*</div></label>
+                        <label><input className='input-label' value={person.pesel} onChange={(e) => setPerson({...person, pesel: e.target.value})} type="text" /> <div>Pesel</div></label>
+                        <label><input className='input-label' value={person.phoneNumber} onChange={(e) => setPerson({...person, phoneNumber: e.target.value})} type="text" /> <div>Numer Telefonu</div></label>
+                        <label><input className='input-label' value={person.address} onChange={(e) => setPerson({...person, address: e.target.value})} type="text" /> <div>Adres</div></label>
+                        <label><input className='input-label' value={person.email} onChange={(e) => setPerson({...person, email: e.target.value})} type="text" /> <div>Email</div></label>
+                        <label><input className='input-label' value={person.conjugateName} onChange={(e) => setPerson({...person, conjugateName: e.target.value})} type="text" /> <div>Odmiana (np. Panie "Ryszardzie")</div></label>
                     </>
                     : 
                     <>
-                        <label><input className='input-label' value={clientCompany} onChange={(e) => setClientCompany(e.target.value)} type="text" required /> <div>Nazwa firmy*</div></label>
-                        <label><input className='input-label' value={nip} onChange={(e) => setNip(e.target.value)} type="text" /> <div>NIP</div></label>
-                        <label><input className='input-label' value={name} onChange={(e) => setName(capitalizeStLetter(e.target.value))} type="text" /> <div>Imie właściciela</div></label>
-                        <label><input className='input-label' value={surname} onChange={(e) => setSurname(capitalizeStLetter(e.target.value))} type="text" /> <div>Nazwisko właściciela</div></label>
-                        <label><input className='input-label' value={pesel} onChange={(e) => setPesel(e.target.value)} type="text" /> <div>Pesel</div></label>
-                        <label><input className='input-label' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} type="text" /> <div>Numer Telefonu</div></label>
-                        <label><input className='input-label' value={address} onChange={(e) => setAddress(e.target.value)} type="text" /> <div>Adres</div></label>
-                        <label><input className='input-label' value={email} onChange={(e) => setEmail(e.target.value)} type="text" /> <div>Email</div></label>
-                        <label><input className='input-label' value={conjugateName} onChange={(e) => setConjugateName(e.target.value)} type="text" /> <div>Odmiana (np. Panie "Ryszardzie")</div></label>
+                        <label><input className='input-label' value={person.clientCompany} onChange={(e) => setPerson({...person, clientCompany: e.target.value})} type="text" required /> <div>Nazwa firmy*</div></label>
+                        <label><input className='input-label' value={person.nip} onChange={(e) => setPerson({...person, nip: e.target.value})} type="text" /> <div>NIP</div></label>
+                        <label><input className='input-label' value={person.name} onChange={(e) => setPerson({...person, name: e.target.value})} type="text" /> <div>Imie właściciela</div></label>
+                        <label><input className='input-label' value={person.surname} onChange={(e) => setPerson({...person, surname: e.target.value})} type="text" /> <div>Nazwisko właściciela</div></label>
+                        <label><input className='input-label' value={person.pesel} onChange={(e) => setPerson({...person, pesel: e.target.value})} type="text" /> <div>Pesel</div></label>
+                        <label><input className='input-label' value={person.phoneNumber} onChange={(e) => setPerson({...person, phoneNumber: e.target.value})} type="text" /> <div>Numer Telefonu</div></label>
+                        <label><input className='input-label' value={person.address} onChange={(e) => setPerson({...person, address: e.target.value})} type="text" /> <div>Adres</div></label>
+                        <label><input className='input-label' value={person.email} onChange={(e) => setPerson({...person, email: e.target.value})} type="text" /> <div>Email</div></label>
+                        <label><input className='input-label' value={person.conjugateName} onChange={(e) => setPerson({...person, conjugateName: e.target.value})} type="text" /> <div>Odmiana (np. Panie "Ryszardzie")</div></label>
                     </>
                     
                     }
@@ -258,9 +183,9 @@ const AddPolicy = () => {
                 : 
                 <>
                 <div className='add-section-forms'>
-                    <label><input className='input-label' value={name} onChange={(e) => {setName(e.target.value); dispatch(getSpecificClient({type: 'name', value: e.target.value}))}} type="text" /> <div>Imie</div></label>
-                    <label><input className='input-label' value={surname} onChange={(e) => {setSurname(e.target.value); dispatch(getSpecificClient({type: 'surname', value: e.target.value}))}} type="text" /> <div>Nazwisko</div></label>
-                    <label><input className='input-label' value={clientCompany} onChange={(e) => {setClientCompany(e.target.value); dispatch(getSpecificClient({type: 'clientCompany', value: e.target.value}))}} type="text" /> <div>Nazwa firmy</div></label>
+                    <label><input className='input-label' value={search.name} onChange={(e) => {setSearch({...search, name: e.target.value}); dispatch(getSpecificClient({type: 'name', value: e.target.value}))}} type="text" /> <div>Imie</div></label>
+                    <label><input className='input-label' value={search.surname} onChange={(e) => {setSearch({...search, surname: e.target.value}); dispatch(getSpecificClient({type: 'surname', value: e.target.value}))}} type="text" /> <div>Nazwisko</div></label>
+                    <label><input className='input-label' value={search.clientCompany} onChange={(e) => {setSearch({...search, clientCompany: e.target.value}); dispatch(getSpecificClient({type: 'clientCompany', value: e.target.value}))}} type="text" /> <div>Nazwa firmy</div></label>
                 </div>
 
                 {/* podręczna lista istniejących klientów */}
@@ -269,16 +194,16 @@ const AddPolicy = () => {
                 </div>
                 <div className='add-section-forms existing-client-list'>
                     {
-                        (name || surname || clientCompany) ? clients.map((client) => {
-                            if (name.search("[\\[\\]?*+|{}\\\\()@.\n\r]") && surname.search("[\\[\\]?*+|{}\\\\()@.\n\r]") && clientCompany.search("[\\[\\]?*+|{}\\\\()@.\n\r]")) {
-                                const reName = new RegExp('^'+name.toLowerCase())
-                                const reSurname = new RegExp('^'+surname.toLowerCase())
-                                const reClientCompany = new RegExp('^'+clientCompany.toLowerCase())
+                        (search.name || search.surname || search.clientCompany) ? clients.map((client) => {
+                            if (search.name.search("[\\[\\]?*+|{}\\\\()@.\n\r]") && search.surname.search("[\\[\\]?*+|{}\\\\()@.\n\r]") && search.clientCompany.search("[\\[\\]?*+|{}\\\\()@.\n\r]")) {
+                                const reName = new RegExp('^'+search.name.toLowerCase())
+                                const reSurname = new RegExp('^'+search.surname.toLowerCase())
+                                const reClientCompany = new RegExp('^'+search.clientCompany.toLowerCase())
                                 
 
-                                return ((name ? reName.test(client.name.toLowerCase()) : true) && 
-                                        (surname ? reSurname.test(client.surname.toLowerCase()) : true) &&
-                                        (clientCompany ? client.clientCompany ? reClientCompany.test(client.clientCompany.toLowerCase()) : false : true)) 
+                                return ((search.name ? reName.test(client.name.toLowerCase()) : true) && 
+                                        (search.surname ? reSurname.test(client.surname.toLowerCase()) : true) &&
+                                        (search.clientCompany ? client.clientCompany ? reClientCompany.test(client.clientCompany.toLowerCase()) : false : true)) 
                                         && <div onClick={(e) => {
                                                 setExistingClientId(client.id); 
                                                 document.querySelectorAll('.existing-client-list-element').forEach((element) => {
@@ -316,9 +241,9 @@ const AddPolicy = () => {
                     <h1>Dane Polisy</h1> 
                 </div>   
                 <div className='add-section-forms'>
-                    <label><input className='input-label' value={policyNumber} onChange={(e) => setPolicyNumber(e.target.value)} type="text" required  /> <div>Numer Polisy*</div></label>
+                    <label><input className='input-label' value={policy.policyNumber} onChange={(e) => setPolicy({...policy, policyNumber: e.target.value})} type="text" required  /> <div>Numer Polisy*</div></label>
                     <label>
-                        <select className='input-label' value={policyCompany} onChange={(e) => setPolicyCompany(e.target.value)}>
+                        <select className='input-label' value={policy.policyCompany} onChange={(e) => setPolicy({...policy, policyCompany: e.target.value || ''})}>
                             <option defaultValue></option>
                             <option>Allianz</option>
                             <option>Aviva</option>
@@ -346,10 +271,9 @@ const AddPolicy = () => {
                             <option>You Can Drive</option>
                         </select> <div>Towarzystwo </div> 
                     </label> 
-                        {/* <input className='input-label' value={policyCompany} onChange={(e) => setPolicyCompany(e.target.value)} type="text" /> <div>Towarzystwo</div>*/}
-                    <label><input className='input-label' value={policyVariant} onChange={(e) => setPolicyVariant(e.target.value)} type="text" /> <div>Typ</div></label>
+                    <label><input className='input-label' value={policy.policyVariant} onChange={(e) => setPolicy({...policy, policyVariant: e.target.value})} type="text" /> <div>Typ</div></label>
                     <label>
-                        <select className='input-label' value={policyType} onChange={(e) => {setPolicyType(e.target.value); setTypeDetailsSt('')}}>
+                        <select className='input-label' value={policy.policyType} onChange={(e) => setPolicy({...policy, typeDetails: {detail1: '', detail2: '', detail3: '', detail4: ''}, policyType: e.target.value})}>
                             <option defaultChecked>komunikacyjna</option>
                             <option>zdrowotna</option>
                             <option>gospodarcza</option>
@@ -365,13 +289,13 @@ const AddPolicy = () => {
 
                 {/* ---------formularze zależne od typu--------- */}
 
-                {policyType == 'komunikacyjna' ?                
+                {policy.policyType == 'komunikacyjna' ?                
                 <div className='add-section-forms type-form'>
-                    <label><input className='input-label' value={typeDetailSt} onChange={(e) => setTypeDetailsSt(e.target.value)} type="text" /> <div>Numer Rejestracyjny</div></label>
-                    <label><input className='input-label' value={typeDetailNd} onChange={(e) => setTypeDetailsNd(e.target.value)} type="text" /> <div>Marka</div></label>
-                    <label><input className='input-label' value={typeDetailRd} onChange={(e) => setTypeDetailsRd(e.target.value)} type="text" /> <div>Model</div></label>
+                    <label><input className='input-label' value={policy.typeDetails.detail1} onChange={(e) => setPolicy({...policy, typeDetails: {...typeDetails, detail1: e.target.value}})} type="text" /> <div>Numer Rejestracyjny</div></label>
+                    <label><input className='input-label' value={policy.typeDetails.detail2} onChange={(e) => setPolicy({...policy, typeDetails: {...typeDetails, detail2: e.target.value}})} type="text" /> <div>Marka</div></label>
+                    <label><input className='input-label' value={policy.typeDetails.detail3} onChange={(e) => setPolicy({...policy, typeDetails: {...typeDetails, detail3: e.target.value}})} type="text" /> <div>Model</div></label>
                     <label>
-                        <select className='input-label' value={typeDetail5Th} onChange={(e) => setTypeDetails5Th(e.target.value)}>
+                        <select className='input-label' value={policy.typeDetails.detail4} onChange={(e) => setPolicy({...policy, typeDetails: {...typeDetails, detail4: e.target.value}})}>
                             <option defaultValue></option>
                             <option>Osobowy</option>
                             <option>Ciężarowy</option>
@@ -379,7 +303,7 @@ const AddPolicy = () => {
                     </label>
                 </div> :
                 <div className='add-section-forms type-form'>
-                    <label><input className='input-label' value={typeDetailSt} onChange={(e) => setTypeDetailsSt(e.target.value)} type="text" /> <div>Szczegóły</div></label>
+                    <label><input className='input-label' value={policy.typeDetails.detail1} onChange={(e) => setPolicy({...policy, typeDetails: {...typeDetails, detail1: e.target.value}})} type="text" /> <div>Szczegóły</div></label>
                 </div> 
                 }
 
@@ -392,9 +316,8 @@ const AddPolicy = () => {
                     <h1>Okres Polisy</h1> 
                 </div>   
                 <div className='add-section-forms type-form'>
-                    <label><DatePicker className='input-label' placeholderText='dzień-miesiąc-rok' onChange={(date) => {setPolicyDateSet(date); setPolicyDateEnd(computeDate(date))}} selected={policyDateSet} dateFormat="dd-MM-yyyy" required></DatePicker> <div>do*</div></label>
-                    <label><DatePicker className='input-label' placeholderText='dzień-miesiąc-rok' onChange={(date) => setPolicyDateEnd(date)} selected={policyDateEnd} dateFormat="dd-MM-yyyy" required></DatePicker> <div>do*</div></label>
-                    
+                    <label><DatePicker className='input-label' placeholderText='dzień-miesiąc-rok' onChange={(date) => setPolicy({...policy, policyDateSet: computeDateToString(date, false), policyDateEnd: computeDateToString(date, true) })} selected={computeStringToDate(policy.policyDateSet)} dateFormat="dd-MM-yyyy" required></DatePicker> <div>do*</div></label>
+                    <label><DatePicker className='input-label' placeholderText='dzień-miesiąc-rok' onChange={(date) => setPolicy({...policy, policyDateEnd: computeDateToString(date, false)})} selected={computeStringToDate(policy.policyDateEnd)} dateFormat="dd-MM-yyyy" required></DatePicker> <div>do*</div></label>
                 </div>
             </article>
             <article className='add-section'>
@@ -402,11 +325,11 @@ const AddPolicy = () => {
                     <h1>Płatność</h1> 
                 </div>   
                 <div className='add-section-forms'>
-                    <label><input className='input-label' value={amount} onChange={(e) => setAmount(e.target.value)} type="number" min="1" step="any" /> <div>Kwota</div></label>
+                    <label><input className='input-label' value={policy.amount} onChange={(e) => setPolicy({...policy, amount: e.target.value})} type="number" min="1" step="any" /> <div>Kwota</div></label>
                 </div>
                 <div className='add-section-forms'>
                     <label>
-                        <select className='input-label' value={installments} onChange={(e) => setInstallments(e.target.value)}>
+                        <select className='input-label' value={policy.installments} onChange={(e) => setPolicy({...policy, installments: e.target.value})}>
                             <option defaultValue>Jednorazowo</option>
                             <option>Pół roku</option>
                             <option>Kwartał</option>
@@ -414,8 +337,8 @@ const AddPolicy = () => {
                     </label>
                 </div>
                 <div className='add-section-forms'>
-                    <div className='add-section-forms-radio'><input type="radio" name='paymentType' onClick={(e) => setPayment('Gotówka')} defaultChecked/> Gotówka</div>
-                    <div className='add-section-forms-radio'><input type="radio" name='paymentType' onClick={(e) => setPayment('Przelew')} /> Przelew</div>
+                    <div className='add-section-forms-radio'><input type="radio" name='paymentType' onClick={(e) => setPolicy({...policy, payment: 'Gotówka'})} defaultChecked/> Gotówka</div>
+                    <div className='add-section-forms-radio'><input type="radio" name='paymentType' onClick={(e) => setPolicy({...policy, payment: 'Przelew'})} /> Przelew</div>
                 </div>
 
                 

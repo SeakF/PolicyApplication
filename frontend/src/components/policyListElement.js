@@ -1,17 +1,24 @@
 import React, {useState} from "react"
 import { Link } from 'react-router-dom'
 import '../styles/policyList.css'
-import PopUpMessage from '../components/popUpMessage'
+import PopUpMessage from './popUpMessage'
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
 import NoteOutlinedIcon from '@material-ui/icons/NoteOutlined'
-import NoteAddComponent from '../components/noteAdd'
+import NoteAddComponent from './NoteAdd'
 
-const PolicyListElement = (props) => {
-
-    const {index, policyData} = props
+const PolicyListElement = ({index, data}) => {
 
     const convertDate = (dateSet, dateEnd, installments) => {
-
+        const stringToDate = (date) => {
+            try {
+                if (date == null || date == '') return null
+                const values = date.split('-')
+                return new Date(values[2], values[1], values[0])
+            } catch {
+                return ''
+            }
+            
+        }
         switch (installments) {
             case 'Jednorazowo':
                 installments = 1
@@ -26,8 +33,8 @@ const PolicyListElement = (props) => {
             default:
                 break;
         }
-        let date1 = new Date(dateSet)
-        let date2 = new Date(dateEnd) 
+        let date1 = new Date(stringToDate(dateSet))
+        let date2 = new Date(stringToDate(dateEnd)) 
         let today = new Date()
 
 
@@ -58,20 +65,13 @@ const PolicyListElement = (props) => {
         }
     }
 
-    const invertDate = (date) => {
-        let parseDate = new Date(date)
-        let day = parseDate.getDate()
-        let month = parseDate.getMonth()+1
-        let year = parseDate.getFullYear()
-
-        if (day < 10) {
-            day = '0' + day
-        }
-        if (month < 10) {
-            month = '0' + month
-        }
-
-        return `${day}-${month}-${year}` 
+    const addMonth = (date) => {
+        if (date == null || date == '') return null
+        const values = date.split('-')
+        values[1] = parseInt(values[1])
+        values[1] = values[1]+1
+        if (values[1] < 10) values[1] = '0' + values[1]
+        return `${values[0]}-${values[1]}-${values[2]}`
     }
     
     return (
@@ -80,40 +80,40 @@ const PolicyListElement = (props) => {
             {index}
         </div>
         <div className='policy-list-element-option'>
-            {policyData.clientCompany || `${policyData.surname} ${policyData.name}`}
+            {data.clientCompany || `${data.surname} ${data.name}`}
         </div>
         <div className='policy-list-element-option'>
-            {policyData.nip || policyData.pesel || '-'}
+            {data.nip || data.pesel || '-'}
         </div>
         <div className='policy-list-element-option'>
-            {policyData.address || '-'}
+            {data.address || '-'}
         </div>
         <div className='policy-list-element-option'>
-            {policyData.policyCompany || '-'} <br /> {policyData.policyNumber}
+            {data.policy.policyCompany || '-'} <br /> {data.policy.policyNumber}
         </div>
         <div className='policy-list-element-option'>
-            {policyData.policyType}<br />  
-            {policyData.typeDetails && policyData.typeDetails.detail1 ? (policyData.typeDetails.detail1  + ' ') : policyData.typeDetails[0] ? (policyData.typeDetails[0]  + ' ') : (' ') + '\ '}
-            {policyData.typeDetails && policyData.typeDetails.detail2 ? (policyData.typeDetails.detail2  + ' ') : policyData.typeDetails[1] ? (policyData.typeDetails[1]  + ' ') : (' ') + '\ '}
-            {policyData.typeDetails && policyData.typeDetails.detail3 ? (policyData.typeDetails.detail3  + ' ') : policyData.typeDetails[3] ? (policyData.typeDetails[3]  + ' ') : (' ') + '\ '}
-            {policyData.typeDetails && policyData.typeDetails.detail5 ? (policyData.typeDetails.detail5  + ' ') : policyData.typeDetails[4] ? (policyData.typeDetails[4]  + ' ') : (' ') + '\ '}
+            {data.policy.policyType}<br />  
+            {data.policy.typeDetails && data.policy.typeDetails.detail1 ? (data.policy.typeDetails.detail1  + ' ') : (' ') + '\ '}
+            {data.policy.typeDetails && data.policy.typeDetails.detail2 ? (data.policy.typeDetails.detail2  + ' ') : (' ') + '\ '}
+            {data.policy.typeDetails && data.policy.typeDetails.detail3 ? (data.policy.typeDetails.detail3  + ' ') : (' ') + '\ '}
+            {data.policy.typeDetails && data.policy.typeDetails.detail5 ? (data.policy.typeDetails.detail5  + ' ') : (' ') + '\ '}
         </div>
         <div className='policy-list-element-option'>
-            {(policyData.policyVariant || '-') + (' ') + '\ '} {(((policyData.written === undefined) || (policyData.written !== true))) ? 'oczekująca' : ''}
+            {(data.policy.policyVariant || '-') + (' ') + '\ '} {(((data.policy.written === undefined) || (data.policy.written !== true))) ? 'oczekująca' : ''}
         </div>
         <div className='policy-list-element-option'>
-            {policyData.payment || '-'}<br /> {policyData.amount ? policyData.amount + ' zł' : '-'}<br /> {policyData.installments || '-'}
+            {data.policy.payment || '-'}<br /> {data.policy.amount ? data.policy.amount + ' zł' : '-'}<br /> {data.policy.installments || '-'}
         </div>
         <div className='policy-list-element-option'>
-            {(policyData.policyDateSet && invertDate(policyData.policyDateSet)) || '-'}
+            {addMonth(data.policy.policyDateSet)}
         </div>
         <div className='policy-list-element-option'>
-            {(policyData.policyDateEnd && invertDate(policyData.policyDateEnd))  || '-'}
+            {addMonth(data.policy.policyDateEnd)}
         </div>
         <div className='policy-list-element-option'>
-            {convertDate(policyData.policyDateSet, policyData.policyDateEnd, policyData.installments)}
+            {convertDate(data.policy.policyDateSet, data.policy.policyDateEnd, data.policy.installments)}
         </div>
-        <PolicyListElementMessage phoneNumber={policyData.phoneNumber} policyId={policyData._id} data={policyData}></PolicyListElementMessage>
+        <PolicyListElementMessage phoneNumber={data.phoneNumber} policyId={data.policy._id} data={data}></PolicyListElementMessage>
     </div>
     )
 }

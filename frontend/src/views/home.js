@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/home.css'
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
-import Navbar from '../components/navbar'
+import Navbar from '../components/Navbar'
 
 const Home = () => {
 

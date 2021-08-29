@@ -1,4 +1,4 @@
-module.exports = ({clientCompany, name, surname, address, company, typeDetailSt, typeDetailNd, typeDetail5Th, policyNumber, policyDateSet, policyDateEnd, policyType}) => {
+module.exports = ({clientCompany, name, surname, address, company, typeDetails, policyNumber, policyDateSet, policyDateEnd, policyType}) => {
 
     let companyAddress 
     switch (company) {
@@ -82,23 +82,7 @@ module.exports = ({clientCompany, name, surname, address, company, typeDetailSt,
             break;
     }
 
-    const simplifyDate = (inputedDate) => {
-        let date = new Date(inputedDate)
-
-        let day = date.getDate()
-        let month = date.getMonth()+1
-        let year = date.getFullYear()
-
-        if (day < 10) {
-            day = '0' + day
-        }
-        if (month < 10) {
-            month = '0' + month
-        }
-
-        return `${day}-${month}-${year}`
-    }
-
+    //wszystko zmniejszone jest lekko bo czcionki z linuxa jakoś dziwnie wszystko podbijają 
 
     if (policyType != "gospodarcza") {
         return `
@@ -224,7 +208,7 @@ module.exports = ({clientCompany, name, surname, address, company, typeDetailSt,
             </div>
             <div class="column">
                 <div>
-                    <span class="margin-top date-font">Biszcza, dnia ____________________________</span>
+                    <span class="margin-top date-font">Miasto, dnia ____________________________</span>
                 </div>
             </div>
         </arcticle>
@@ -258,16 +242,16 @@ module.exports = ({clientCompany, name, surname, address, company, typeDetailSt,
         <article>
             <div>
                 <p class="small-font">
-                    <b>Pojazd:</b> ${(typeDetailNd == '-' || typeDetailNd == null) ? `_______________________` : typeDetailNd}${(typeDetail5Th == '-' || typeDetail5Th == null) ? `________________________` : ' '+typeDetail5Th}
+                    <b>Pojazd:</b> ${(typeDetails.detail2 == '-') ? `_______________________` : typeDetails.detail2}${(typeDetails.detail4 == '-') ? `________________________` : ' '+typeDetails.detail4}
                 </p>
                 <p class="small-font">
-                    <b>Nr rejestracyjny:</b> ${(typeDetailSt == '-' || typeDetailSt == null) ? `___________________________________________` : typeDetailSt}
+                    <b>Nr rejestracyjny:</b> ${(typeDetails.detail1 == '-') ? `___________________________________________` : typeDetails.detail1}
                 </p>
                 <p class="small-font">
                     <b>Nr polisy:</b> ${policyNumber || `_________________________________________________`}
                 </p>
                 <p class="small-font">
-                    <b>Okres Ubezpieczenia:</b> od dnia: ${simplifyDate(policyDateSet)} do dnia: ${simplifyDate(policyDateEnd)}
+                    <b>Okres Ubezpieczenia:</b> od dnia: ${policyDateSet} do dnia: ${policyDateEnd}
                 </p>
             </div>
         </article>
@@ -493,7 +477,7 @@ module.exports = ({clientCompany, name, surname, address, company, typeDetailSt,
             </div>
             <div class="column">
                 <div>
-                    <span class="margin-top date-font">Biszcza, dnia ____________________________</span>
+                    <span class="margin-top date-font">Miasto, dnia ____________________________</span>
                 </div>
             </div>
         </arcticle>

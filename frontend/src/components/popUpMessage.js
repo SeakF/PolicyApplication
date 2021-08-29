@@ -6,8 +6,6 @@ import { selectClient } from '../features/clients/clients'
 
 const PopUpMessage = ({switchPopUp, data}) => {
 
-    
-
     const clients = useSelector(selectClient)
     const [foundClient, setFoundClient] = useState()
     const [message, setMessage] = useState('')
@@ -34,56 +32,37 @@ const PopUpMessage = ({switchPopUp, data}) => {
         }
         
     }
-
     getPoints()
 
-    const simplifyDate = (inputedDate) => {
-        let date = new Date(inputedDate)
-
-        let day = date.getDate()
-        let month = date.getMonth()+1
-        let year = date.getFullYear()
-
-        if (day < 10) {
-            day = '0' + day
-        }
-        if (month < 10) {
-            month = '0' + month
-        }
-
-        return `${day}-${month}-${year}`
-    }
-    
     useEffect(() => {
-        if (data.clientData) {
+        if (Array.isArray(data.policy)) {
             clients.map((client) => {
-                (client._id === data.clientData._id) && setFoundClient(client)//setFoundClient(client) 
+                return (client._id === data._id) && setFoundClient(client)
             })
         } else {
-            if (data.policy) {
-                clients.map((client) => {
-                    (client._id === data._id) && setFoundClient(client)
-                }) 
-                
-            } else {
-                clients.map((client) => {
-                    client.policy.map((policy) => {
-                        (policy.policyNumber === data.policyNumber) && setFoundClient(client)
-                    })
+            clients.forEach(client => {
+                client.policy.map((policy) => {
+                    return (policy._id === data.policy._id) && setFoundClient(client)
                 })
-            }
+            })
         }
-
-        
         simplifyChars()
     }, [clients])
 
+    const addMonth = (date) => {
+        if (date == null || date == '') return null
+        const values = date.split('-')
+        values[1] = parseInt(values[1])
+        values[1] = values[1]+1
+        if (values[1] < 10) values[1] = '0' + values[1]
+        return `${values[0]}-${values[1]}-${values[2]}`
+    }
+
     useEffect(() => {
         if (foundClient) {
-            if (data.policy) setMessage('')
+            if (Array.isArray(data.policy)) setMessage('')
             else {
-                if (data.clientData) setMessage(`${data.clientData.clientCompany || `${data.clientData.conjugateName ||`${data.clientData.name}`}`},${simplifyDate(data.policyData.policyDateEnd)} konczy sie ubezpieczenie na ${data.policyData.typeDetails.detail1 && data.policyData.typeDetails.detail1 || '(nr rej)'}.Zapraszamy do:Ubezpieczenia A.Sawicka Biszcza94D(Stokrotka)Tel.535003019`)
-                else setMessage(`${data.clientCompany || `${data.conjugateName ||`${data.name}`}`},${simplifyDate(data.policyDateEnd)} konczy sie ubezpieczenie na ${data.typeDetails.detail1 && data.typeDetails.detail1 || '(nr rej)'}.Zapraszamy do:Ubezpieczenia A.Sawicka Biszcza94D(Stokrotka)Tel.535003019`)
+                setMessage(`${data.clientCompany || `${data.conjugateName || `${data.name}`}`}, ${addMonth(data.policy.policyDateEnd)} konczy sie ubezpieczenie na ${data.policy.typeDetails.detail1 || '(nr rej)'}.`)
             }
         }
         }, [foundClient])
@@ -114,7 +93,6 @@ const PopUpMessage = ({switchPopUp, data}) => {
             console.log('pusta wiadomość')
             return
         }
-        console.log(phoneNumber, message)
 
         const options = {
             method: 'POST',
@@ -139,12 +117,12 @@ const PopUpMessage = ({switchPopUp, data}) => {
                 <div className='popUp-main'>
                     <div className='popUp-menu no-select'>
                         <div className='popUp-menu-inner'>
-                            <span>{data.clientCompany || (data.clientData && data.clientData.clientCompany) || `${data.name || (data.clientData && data.clientData.name)} ${data.surname || (data.clientData && data.clientData.surname)}`}</span><br />
+                            <span>{data.clientCompany || `${data.name} ${data.surname}`}</span><br />
                             <span>{data.phoneNumber || (data.clientData && data.clientData.phoneNumber)}</span>
                         </div>
                             <div className="balance">{balance || 'ładowanie'} pkt.</div>
                         <div className='popUp-menu-inner'>
-                            <button className='popUp-button' onClick={() => sendSms(data.phoneNumber || data.clientData && data.clientData.phoneNumber, message)}>
+                            <button className='popUp-button' onClick={() => sendSms(data.phoneNumber, message)}>
                                 wyślij
                             </button> 
                         </div>
@@ -158,40 +136,38 @@ const PopUpMessage = ({switchPopUp, data}) => {
                         </div>
                         <div>
                             <h4>Dane klienta</h4>
-                            {data.clientCompany || (data.clientData && data.clientData.clientCompany) && <>
-                                <b>nazwa firmy:</b> {data.clientCompany || (data.clientData && data.clientData.clientCompany) && data.clientData.clientCompany} <br />
+                            {data.clientCompany && <>
+                                <b>nazwa firmy:</b> {data.clientCompany} <br />
+                                <b>nip:</b> {data.nip} <br />
                             </>} 
-                            {data.clientCompany || (data.clientData && data.clientData.clientCompany) && <>
-                                <b>nip:</b> {data.nip || (data.clientData && data.clientData.clientCompany) && data.clientData.clientCompany} <br />
-                            </>} 
-                            <b>imie:</b> {data.name || (data.clientData && data.clientData.name) && data.clientData.name}<br />  
-                            <b>nazwisko:</b> {data.surname || (data.clientData && data.clientData.surname) && data.clientData.surname}<br />  
-                            <b>pesel:</b> {data.pesel || (data.clientData && data.clientData.pesel) && data.clientData.pesel}<br />  
-                            <b>adres:</b> {data.address || (data.clientData && data.clientData.address) && data.clientData.address}  
+                            <b>imie:</b> {data.name}<br />  
+                            <b>nazwisko:</b> {data.surname}<br />  
+                            <b>pesel:</b> {data.pesel}<br />  
+                            <b>adres:</b> {data.address}  
                         </div>
                         <div>
                             <h4>Dane Polisy</h4>
                             {
-                            !data.policy || data.policyData ? 
+                            !Array.isArray(data.policy) ? 
                             <>
 
-                                <b>numer:</b> {data.policyNumber || (data.policyData && data.policyData.policyNumber) && data.policyData.policyNumber}<br />  
-                                <b>okres polisy:</b> {(data.policyDateSet && simplifyDate(data.policyDateSet)) || (data.policyData && data.policyData.policyDateSet) && simplifyDate(data.policyData.policyDateSet)} - {(data.policyDateEnd && simplifyDate(data.policyDateEnd)) || (data.policyData && data.policyData.policyDateEnd) && simplifyDate(data.policyData.policyDateEnd)}<br />  
-                                <b>raty:</b> {data.installments || (data.policyData && data.policyData.installments) && data.policyData.installments}<br />  
-                                <b>kwota:</b> {data.amount || (data.policyData && data.policyData.amount) && data.policyData.amount}<br />  
-                                <b>płatność:</b> {data.payment || (data.policyData && data.policyData.payment) && data.policyData.payment}<br /> 
-                                <b>towarzystwo:</b> {data.policyCompany || (data.policyData && data.policyData.policyCompany) && data.policyData.policyCompany}<br />
-                                <b>typ:</b> {data.policyType || (data.policyData && data.policyData.policyType) && data.policyData.policyType}<br />
-                                {(data.policyType == 'komunikacyjna') || ((data.policyData && data.policyData.policyType) && data.policyData.policyType == 'komunikacyjna') ?
+                                <b>numer:</b> {data.policy.policyNumber}<br />  
+                                <b>okres polisy:</b> {data.policy.policyDateEnd} - {data.policy.policyDateEnd}<br />  
+                                <b>raty:</b> {data.policy.installments}<br />  
+                                <b>kwota:</b> {data.policy.amount}<br />  
+                                <b>płatność:</b> {data.policy.payment}<br /> 
+                                <b>towarzystwo:</b> {data.policy.policyCompany}<br />
+                                <b>typ:</b> {data.policy.policyType}<br />
+                                {(data.policy.policyType == 'komunikacyjna') ?
                                 <>
-                                    <b>nr rej:</b> {(data.typeDetails && data.typeDetails.detail1) || (data.policyData && data.policyData.typeDetails.detail1) && data.policyData.typeDetails.detail1}<br />  
-                                    <b>marka:</b> {(data.typeDetails && data.typeDetails.detail2) || (data.policyData && data.policyData.typeDetails.detail2) && data.policyData.typeDetails.detail2}<br />  
-                                    <b>model:</b> {(data.typeDetails && data.typeDetails.detail3) || (data.policyData && data.policyData.typeDetails.detail3) && data.policyData.typeDetails.detail3}<br />  
-                                    <b>typ:</b> {(data.typeDetails && data.typeDetails.detail5) || (data.policyData && data.policyData.typeDetails.detail5) && data.policyData.typeDetails.detail5}<br />  
+                                    <b>nr rej:</b> {data.policy.typeDetails.detail1}<br />  
+                                    <b>marka:</b> {data.policy.typeDetails.detail2}<br />  
+                                    <b>model:</b> {data.policy.typeDetails.detail3}<br />  
+                                    <b>typ:</b> {data.policy.typeDetails.detail4}<br />  
                                 </>
                                 :
                                 <>
-                                    <b>szczegóły:</b> {(data.typeDetails && data.typeDetails.detail1) || (data.policyData && data.policyData.typeDetails.detail1) && data.policyData.typeDetails.detail1}<br />
+                                    <b>szczegóły:</b> {data.policy.typeDetails.detail1}<br />
                                 </>
                                 } 
                             </>
@@ -207,7 +183,7 @@ const PopUpMessage = ({switchPopUp, data}) => {
                             {foundClient && foundClient.policy.map((policy, idx) => {
                                 return (
                                     <div key={idx}>
-                                        <b>numer:</b> {policy.policyNumber} <b>okres:</b> {simplifyDate(policy.policyDateSet)} - {simplifyDate(policy.policyDateEnd)} <b>raty:</b> {policy.installments}
+                                        <b>numer:</b> {policy.policyNumber} <b>okres:</b> {policy.policyDateSet} - {policy.policyDateEnd} <b>raty:</b> {policy.installments}
                                     </div>
                                 )
                             })}

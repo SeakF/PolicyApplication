@@ -18,10 +18,6 @@ const TypeDetailsSchema = new Schema({
     detail4: {
         type: String,
         required: false
-    },
-    detail5: {
-        type: String,
-        required: false
     }
 })
 
@@ -41,10 +37,6 @@ const PolicySchema = new Schema({
     },
     typeDetails: TypeDetailsSchema,
     policyVariant: {
-        type: String,
-        required: false
-    },
-    policyConfirmDate: {
         type: String,
         required: false
     },
@@ -83,13 +75,21 @@ const PolicySchema = new Schema({
 const UserSchema = new Schema({
     name: {
         type: String,
-        required: true
+        required: false
     },
     surname: {
         type: String,
-        required: true
+        required: false
     },
     pesel: {
+        type: String,
+        required: false
+    },
+    clientCompany: {
+        type: String,
+        required: false
+    },
+    nip: {
         type: String,
         required: false
     },
